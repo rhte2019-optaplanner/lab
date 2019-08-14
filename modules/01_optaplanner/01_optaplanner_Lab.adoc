@@ -1,0 +1,250 @@
+:scrollbar:
+:data-uri:
+:toc2:
+
+= Red Hat Tech Exchange 2019: OptaPlanner 101 - Building your first optimization app using OptaPlanner's AI Constraint Solver
+
+== Background
+
+Almost every organization has to deal with planning problems to perform its business operations. Whether its transporting goods from a warehouse to stores, assigning employees to shifts, inspecting and servicing vehicles, or allocating tasks to departments, the more efficient and effective these tasks can be performed, the bigger the competitive advantage of an organization will be.
+
+The aforementioned planning problems fall in a category of problems that are, in the academic world, known as NP-Complete and/or NP-Hard problems. What this in essence means is that there is no known algorith to solve these problems in polynomial time. Whenever the problem space of a problem grows, the time to find the solution to these problems grows exponentially.
+
+As an example take the CloudBalance problem, in which computer processes/workloads need to be assigned to computers. For a problem in which we need to assign 300 processes to 100 computers, the amount of possible solutions is 100 ^ 300, which is equal to 10^600. Compare this to the number of atoms in the observable universe, which is 10^80, and one can see the vastness of the solution space of these kind of problems.
+
+image::images/cloudBalanceSearchSpaceSize-2.png[]
+
+In this lab you will be introduced to OptaPlanner/Business Optimizer, Red Hat’s A.I. Constraint Solver. OptaPlanner provides advanced A.I. heuristic algorithms that, combined with a domain model and constraint rules, allows organizations to find optimal solutions to their planning problems.
+
+== Prerequisites
+
+*Tools*
+
+Most of the tools required will be provided in your by CodeReady WorkSpaces environment. The tools you need locally are:
+
+* a browser (Chrome, Firefox)
+
+*Skills*
+
+* OpenShift Basics, familiarity with `oc` CLI tool and the OpenShift web console
+* Familiarity with Unix command line and terminal based text editors
+* Familiarity with IDEs, like Eclipse, IntelliJ.
+* Java
+* Maven
+
+== Glossary
+
+*OptaPlanner*: The open source AI Constraint Satisfaction Solver: https://www.optaplanner.org
+
+*CodeReady Workspaces*: the cloud-native Integrated Development Environment on OpenShift.: https://developers.redhat.com/products/codeready-workspaces/overview
+
+== Goals and learning objectives
+
+* Understand what planning problems are.
+* Understand how OptaPlanner can provide optimal solutions to these kind of problems using advanced A/I Heuristic Algorithms.
+* Develop an OptaPlanner domain model for the _CloudBalancing_ problem.
+* Write constraint rules for the _CloudBalancing_ problem.
+
+== What is a Planning Problem?
+
+A planning problem is a problem in which you want to:
+* Optimize *Goals*
+* With limited *Resources*
+* Under *Constraints*
+
+Examples of known planning problems are:
+* Vehicle Routing (VRP)
+* Shift Assignment
+* Employee Rostering
+* Conference Scheduling
+* Hospital Bed Planning
+* Exam Scheduling
+
+In all of these examples, there is a certain goal, e.g. reduce fuel cost. There are resources, e.g. vehicles. And there are constraints, e.g. the maximum vehicle capacity. OptaPlanner takes all these facts into account and will use A/I heuritics algorithms to find the optimal solution to such a given problem.
+Constraints, their level and their weights can be easily altered, allowing the user full flexibility on what he/she wants to optimize on. For example, purely optimizing on costs can have negative downsides on other areas, like employee well-being or CO2 emissions.
+
+== Use Case
+
+The use case for this lab is the _CloudBalancing_ problem. The _CloudBalancing_ problem is a problem in which we need to assign computer _processes/workloads_ to a set of _computers_.
+
+image::images/cloudBalanceUseCase.png[]
+
+
+== Architecture
+
+OptaPlanner is a lightweight Java library, and as such can be deployed on, and integrated with, virtually any environment.
+
+image::images/integrationOverview.png[]
+
+OptaPlanner solutions can be run on premise and in the cloud, as nightly (batch) planning engine, as well as realtime planning engine.
+This flexibility allows users to architect, design and implement an OptaPlanner solution specifically for their problem, their needs and their environment.
+
+As OptaPlanner is a Java-based platform, OptaPlanner solutions are build in Java. This means that the problem's domain model can be defined and written as simple PoJo, and constraint rules can be written in either Java or in Drools, the open-source business rules engine.
+
+In this lab we will simply use OptaPlanner as library runnning in our IDE. Data will be loaded from, and written to, a spreadsheet (Excel). We will build and run the planning engine from our IDE.
+
+
+== Lab Material
+
+The lab material is hosted on GitHub, at the following URL:
+
+`https://github.com/rhte2019-optaplanner`
+
+The material consists of a number of git repositories:
+
+* *cloud-balancing-lab-step-1*
+* *cloud-balancing-lab-step-2*
+* *cloud-balancing-lab-step-3*
+
+These Git repositories represent different stages within the lab. As we you only have 120 minutes to finnish the lab, some parts of the application have already been pre-defined for you in each step.
+
+
+== Code Walkthrough
+
+Given the limited time we have for this lab, we will provide you with the full domain model of our _CloudBalance_ problem. Your tasks will be to:
+
+* annotate the domain model with the correct OptaPlanner annotations that instruct the engine which roles the specific classes of our domain play in our solution.
+* write the logic to load the problem data and start the OptaPlanner planning engine.
+* write the constraints of the solution that instruct OptaPlanner on what to optimize.
+
+The class diagram of our _CloudBalance_ problem domain looks as follows:
+
+image::images/cloudBalanceClassDiagram_1.png[]
+
+There are 2 classes:
+* Process: the computer process/workload to run
+* Computer: the computer on which to run the process
+
+A _Process_ has requirements in terms of required resources:
+* Computer
+* Memory
+* Network Bandwidth
+
+
+
+
+
+
+
+
+NOTE: Bla Bla
+
+WARNING: In the OpenShift lab environment, which has limited resources, the login to jenkins might take a while and can eventually time out. If this is the case, you can skip the next step and safely continue with the remainder of the lab - the deployment of the application services.
+
+This is nice as well:
+
+----
+this is nice as well <1>
+----
+<1> see how nice that is!!
+
+== OpenShift Environment
+
+An shared Openshift environment is provided. In this OpenShift environment we have deployed a _CodeReady Workspaces_ environment: A collaborative Kubernetes-native development solution that delivers OpenShift workspaces and in-browser IDE for rapid cloud application development.
+
+Details about the environment are obtained through the Red Hat Summit _GuidGrabber_.
+
+. In a browser window, navigate to http://bit.ly/summit-guidgrabber.
++
+image::images/guid_grabber_landing_page_summit.png[]
+. From this page select the Lab Code : `TA39DD: Next-Gen Process Management: a microservices approach to business automation`
+. Enter the *Activation Key*: `nextgenprocessmanagement`.
+. Enter your email address.
+. Click `Submit`.
+. The resulting page will display your lab’s GUID and other useful information about your lab environment. +
++
+image::images/guid_grabber_details_page_2.png[]
+
+. When you are completely done with your lab environment, please click `Reset Workstation` so that you can move on to the next lab. If you fail to do this, you will be locked into the GUID from the previous lab.
++
+NOTE: Clicking Reset Workstation will not stop or delete the lab environment.
+
+To log in into the OpenShift console:
+
+* Navigate to the URL `https://master00-<GUID>.generic.opentlc.com` - replace `<GUID>` with the lab GUID from the GuidGrabber tool.
+* Login with username `user1` and the password mentioned in the GuidGrabber tool.
+* Your OpenShift cluster uses self-signed certificates, so expect a security warning in the browser. Create a security exception and proceed.
+
+
+== CodeReady WorkSpaces
+# Import Labs
+
+In this section you will learn:
+
+1. How to access CodeReady Workspaces
+
+2. Import an existing project into CodeReady Workspaces
+
+
+## CodeReady Workspaces
+
+Red Hat CodeReady Workspaces is a developer workspace server and cloud IDE. Workspaces are defined as project code files and all of their dependencies neccessary to edit, build, run, and debug them. Each workspace has its own private IDE hosted within it. The IDE is accessible through a browser. The browser downloads the IDE as a single-page web application.
+
+Red Hat CodeReady Workspaces provides:
+
+- Workspaces that include runtimes and IDEs
+- RESTful workspace server
+- A browser-based IDE
+- Plugins for languages, framework, and tools
+- An SDK for creating plugins and assemblies
+
+
+
+## Accessing CodeReady Workspaces
+
+A CodeReady Workspaces environment has been created for every workshop user. To access your environment, use the link that is provided to you by your lab instructor. You can login with the OpenShift username and password that have been provided to you.
+
+- In the CodeReady Workspaces login screen, click on "Openshift v3" on the right part of the form. You will be redirected to the OpenShift login screen.
+    ![CodeReady Workspaces Login OpenShift]({% image_path codeready-login-openshift.png %}){:width="600px"}
+- Login with the workshop credentials that have been provided to you.
+- An _Authorize Access_ screen will be presented. Leave `user_full` checkbox checked and click on `Allow selected permissions`.
+    ![CodeReady Workspaces Authorize Access]({% image_path codeready-authorize-access.png %}){:width="600px"}
+- In the next screen, provide additional user information. This can be dummy information for this workshop.
+    ![CodeReady Workspaces User Information]({% image_path codeready-user-information.png %}){:width="600px"}
+
+CodeReady Workspaces will open and show the initial screen.
+
+![CodeReady Workspaces Initial Screen]({% image_path codeready-initial-screen.png %}){:width="600px"}
+
+
+### Importing a Project
+
+CodeReady allows us to directly import existing projects from GitHub.
+
+In the initial screen, the `New Workspace` screen, that the platform provides us, we can import a new project.
+
+1. Provide a name for your workspace, postfixed by your username. E.g, `optaplanner-lab1-user1` if you're username is `user1`.
+2. Select the _stack_. In this case we select `Java 1.8`.
+3. Set the RAM (memory) of the `dev-machine` to 2GB (default value).
+4. Click on `Create and Open` button to create the workspace.
+    ![CodeReady Workspaces New Workspace]({% image_path codeready-new-workspace.png %}){:width="600px"}
+5. When the workspace has been created, click on `Import Project`.
+    ![CodeReady Workspaces Workspace Created]({% image_path codeready-workspace-created.png %}){:width="600px"}
+6. In the _Import Project_ window, select `GITHUB` as the _Version Control System_, set the URL to `https://github.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m1-labs` and click on the _Import_ button.
+    ![CodeReady Workspaces Import Lab 1]({% image_path codeready-workspaces-import-lab1.png %}){:width="600px"}
+7. In the _Project Configuration_ screen, select `Maven` and click the _Save_ button.
+
+Our imported project is an empty Maven Java JAR project, with a number of predefined dependencies in the POM file, and a number of default folders, i.e. `src/main/java` and `src/main/resources`. Open the POM file by clicking on the `pom.xml` file of the project. Observe the dependencies that have been pre-defined, the the `optaplanner-core` dependency.
+
+![CodeReady Workspaces Lab 1 POM]({% image_path codeready-lab1-pom.png %}){:width="600px"}
+
+
+### Compiling the project
+
+To make sure our skeleton project for Lab1 is properly imported and configured, we will first run a Maven build. To do this, we need to access the CodeReady commands as show in the image below:
+
+![CodeReady Manage Commands]({% image_path codeready-manage-commands.png %}){:width="600px"}
+
+In the commands section, expand the _Build_ section, click on `build`, and in the main window of the IDE, click on the green `RUN` button.
+
+![CodeReady Maven Builds]({% image_path codeready-maven-builds.png %}){:width="600px"}
+
+A build will run and the output will be displayed in the console at the bottom of the screen. If the build succeeded, the following message will be displayed:
+```
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 9.697 s
+[INFO] Finished at: 2019-07-02T14:19:06Z
+[INFO] ------------------------------------------------------------------------
+```
