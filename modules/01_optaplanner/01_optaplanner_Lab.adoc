@@ -121,9 +121,11 @@ A _Process_ has requirements in terms of required resources:
 * Network Bandwidth
 
 
+A _Computer_ provides a certain amount of resources (CPU, Memory, Network Bandwidth) and has a certain cost.
 
-
-
+The goal is to create a planning solution that places processes on computers in such a way that:
+* Computers do not get overloaded. I.e. the amount of resources required by the _Processes_ placed on the _Computer_ does not exceed the available resources of the _Computer_.
+* Minimize the total cost of the required computers.
 
 
 
@@ -167,16 +169,6 @@ To log in into the OpenShift console:
 
 
 == CodeReady WorkSpaces
-# Import Labs
-
-In this section you will learn:
-
-1. How to access CodeReady Workspaces
-
-2. Import an existing project into CodeReady Workspaces
-
-
-## CodeReady Workspaces
 
 Red Hat CodeReady Workspaces is a developer workspace server and cloud IDE. Workspaces are defined as project code files and all of their dependencies neccessary to edit, build, run, and debug them. Each workspace has its own private IDE hosted within it. The IDE is accessible through a browser. The browser downloads the IDE as a single-page web application.
 
@@ -189,55 +181,58 @@ Red Hat CodeReady Workspaces provides:
 - An SDK for creating plugins and assemblies
 
 
-
 ## Accessing CodeReady Workspaces
 
 A CodeReady Workspaces environment has been created for every workshop user. To access your environment, use the link that is provided to you by your lab instructor. You can login with the OpenShift username and password that have been provided to you.
 
 - In the CodeReady Workspaces login screen, click on "Openshift v3" on the right part of the form. You will be redirected to the OpenShift login screen.
-    ![CodeReady Workspaces Login OpenShift]({% image_path codeready-login-openshift.png %}){:width="600px"}
+    image:images/codeready-login-openshift.png[]
 - Login with the workshop credentials that have been provided to you.
 - An _Authorize Access_ screen will be presented. Leave `user_full` checkbox checked and click on `Allow selected permissions`.
-    ![CodeReady Workspaces Authorize Access]({% image_path codeready-authorize-access.png %}){:width="600px"}
+    image:images/codeready-authorize-access.png[]
 - In the next screen, provide additional user information. This can be dummy information for this workshop.
-    ![CodeReady Workspaces User Information]({% image_path codeready-user-information.png %}){:width="600px"}
+    images:image/codeready-user-information.png[]
 
 CodeReady Workspaces will open and show the initial screen.
 
-![CodeReady Workspaces Initial Screen]({% image_path codeready-initial-screen.png %}){:width="600px"}
+image:images:codeready-initial-screen.png[]
 
 
-### Importing a Project
+### Importing the Project
 
-CodeReady allows us to directly import existing projects from GitHub.
+We will now import the base project, which already includes the solution's domain classed, into CodeReady. CodeReady allows us to directly import existing projects from GitHub.
 
 In the initial screen, the `New Workspace` screen, that the platform provides us, we can import a new project.
 
-1. Provide a name for your workspace, postfixed by your username. E.g, `optaplanner-lab1-user1` if you're username is `user1`.
+1. Provide a name for your workspace, postfixed by your username. E.g, `cloud-balancing-user1` if you're username is `user1`.
 2. Select the _stack_. In this case we select `Java 1.8`.
 3. Set the RAM (memory) of the `dev-machine` to 2GB (default value).
 4. Click on `Create and Open` button to create the workspace.
-    ![CodeReady Workspaces New Workspace]({% image_path codeready-new-workspace.png %}){:width="600px"}
+    image:images/codeready-new-workspace.png[]
 5. When the workspace has been created, click on `Import Project`.
-    ![CodeReady Workspaces Workspace Created]({% image_path codeready-workspace-created.png %}){:width="600px"}
-6. In the _Import Project_ window, select `GITHUB` as the _Version Control System_, set the URL to `https://github.com/RedHat-Middleware-Workshops/optaplanner-workshop-v1m1-labs` and click on the _Import_ button.
-    ![CodeReady Workspaces Import Lab 1]({% image_path codeready-workspaces-import-lab1.png %}){:width="600px"}
+    image:images/codeready-workspace-created.png[]
+6. In the _Import Project_ window, select `GITHUB` as the _Version Control System_, set the URL to `https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-1` and click on the _Import_ button.
+    image:images/codeready-workspaces-import-lab1.png[]
 7. In the _Project Configuration_ screen, select `Maven` and click the _Save_ button.
 
-Our imported project is an empty Maven Java JAR project, with a number of predefined dependencies in the POM file, and a number of default folders, i.e. `src/main/java` and `src/main/resources`. Open the POM file by clicking on the `pom.xml` file of the project. Observe the dependencies that have been pre-defined, the the `optaplanner-core` dependency.
+Our imported project is our base _Cloud Balancing_ project. It contains:
 
-![CodeReady Workspaces Lab 1 POM]({% image_path codeready-lab1-pom.png %}){:width="600px"}
-
+* the Maven POM file with all required dependencies.
+* the domain model of our Cloud Balancing solver application.
+* an empty `ScoreCalculator`. This component is responsible for calculating the _score_ of the solution.
+* a _repository_ class responsible for loading the problem data from the filesystem
+* a _data_ directory with 2 unsolved problems.
+* two unit-tests: one test that runs the OptaPlanner `Solver` with on the unsolved problems as input, and one test that tests the `CloudBalanceRepository`.
 
 ### Compiling the project
 
-To make sure our skeleton project for Lab1 is properly imported and configured, we will first run a Maven build. To do this, we need to access the CodeReady commands as show in the image below:
+To make sure our project for Lab1 is properly imported and configured, we will first run a Maven build. To do this, we need to access the CodeReady commands as show in the image below:
 
-![CodeReady Manage Commands]({% image_path codeready-manage-commands.png %}){:width="600px"}
+image:images/codeready-manage-commands.png[]
 
 In the commands section, expand the _Build_ section, click on `build`, and in the main window of the IDE, click on the green `RUN` button.
 
-![CodeReady Maven Builds]({% image_path codeready-maven-builds.png %}){:width="600px"}
+image:images/codeready-maven-builds.png[]
 
 A build will run and the output will be displayed in the console at the bottom of the screen. If the build succeeded, the following message will be displayed:
 ```
@@ -248,3 +243,37 @@ A build will run and the output will be displayed in the console at the bottom o
 [INFO] Finished at: 2019-07-02T14:19:06Z
 [INFO] ------------------------------------------------------------------------
 ```
+
+
+=== Domain Model
+
+You have been provided with the domain model. This domain model consists of 3 classes:
+
+* `CloudProcess`: the process that needs to be assigned to a computer.
+* `CloudComputer`: the computer to which to assign the processes.
+* `CloudBalance`: this class holds the Cloud Balancing problem and solution, as well as the score of the solution.
+
+The `CloudBalance` class is the class in which we will load the initial problem. This means that this class holds a `Collection` of `CloudProcess` and a `Collection` of `CloudComputer`.
+While solving the problem, OptaPlanner creates a lot of different solutions, and for each solution it calculates a _score_. This score is also kept in the `CloudBalance` class.
+When OptaPlanner finds a solution with a better score than the current best score, this solution is cloned and kept in a cloned instance of our `CloudBalance` class.
+
+Although we've given you the basic domain model, the model is not yet complete and cannot yet be used by OptaPlanner. This is due to the fact that OptaPlanner is not aware yet of the roles that each class plays. We need to provide this information to OptaPlanner by annotating our domain model with OptaPlanner annotations.
+
+To demonstrate this, we need to enable the unit-test found in class `org.optaplanner.examples.cloudbalancing.persistence.CloudBalancingSolverTest`. This class can be found in the `src/test/java` folder.
+
+. Open the class `CloudBalancingSolverTest`.
+. Uncomment the `@Test` annotation on the `testCloudBalance` method.
++
+image:images/cloud-balancing-solver-test.png[]
++
+. Right-click anywhere in the test class to open a contextual menu. Click on _Test -> Run Test_.
+image:images/codeready-run-test.png[]
+
+The test will fail with the following exception:
+
+----
+The scanAnnotatedClasses (ScanAnnotatedClassesConfig()) did not find any classes with a PlanningSolution annotation.
+Maybe you forgot to annotate a class with a PlanningSolution annotation.
+----
+
+We
