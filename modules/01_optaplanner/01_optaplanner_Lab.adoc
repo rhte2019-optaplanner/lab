@@ -276,4 +276,190 @@ The scanAnnotatedClasses (ScanAnnotatedClassesConfig()) did not find any classes
 Maybe you forgot to annotate a class with a PlanningSolution annotation.
 ----
 
-We
+=== OptaPlanner Annotations
+
+Before we can annotate our domain model, we need to understand a number of basic OptaPlanner concepts and annotations.
+
+For OptaPlanner to be able to solve a problem, it basically needs to know 3 things about your planning problem:
+
+* What are the _Planning Entities_: A planning entity is a JavaBean (POJO) that changes during solving. For example, a Process that gets assigned to different computers, or a ShiftAssignment that gets assigned to employees.
+* What are the _Planning Variables_: a variable (or property, or attribute) of a PlannningEntity. This is the property that OptaPlanner can ‘play with’ during planning. For example the computer property of a Process, or the employee and shift of a ShiftAssignment.
+* What is the _PlanningSolution_: A dataset for a planning problem needs to be wrapped in a class OptaPlanner to solve. The solution class represents both the planning problem and (if solved) a solution. The PlanningSolution also holds the score of the solution.
+
+The error we got when running our test stated that OptaPlanner could not find a class with a `@PlanningSolution` annotation. In our domain model, the `CloudBalance` class is the class that holds the planning problem, hence, this is our `PlanningSolution` class.
+
+. Open the `CloudBalance` class. It can be found in the `src/main/java` folder, in the package `org.optaplanner.examples.cloudbalancing.domain`.
+. Add the `@PlanningAnnotation` to the class.
++
+----
+@PlanningSolution
+@XStreamAlias("CloudBalance")
+public class CloudBalance extends AbstractPersistable {
+----
++
+. Save the file.
+. Run the `CloudBalancingSolverTest` unit-test class.
+
+We have instructed OptaPlanner which class in our domain is our `PlanningSolution` class. When we look at the output of our unit-test, we will now see a different exception:
+
+----
+java.lang.IllegalStateException: The scanAnnotatedClasses (ScanAnnotatedClassesConfig()) did not find any classes with a PlanningEntity annotation.
+----
+
+As we can see, we need to instruct OptaPlanner which of our classes is our `PlanningEntity`. The `PlanningEntity` is the object that changes during solving. A common practice when defining an OptaPlanner domain model is to look at the relationships between classes (and hence, it's always a good practive to draw a UML diagram of your problem domain).
+The `PlanningEntity` and `PlanningVariable` always have a relationship with each other, as the `PlanningVariable` is a property, or attribute of the PlanningEntity. This relationship is (usually) a _one-to-many_ relationship.
+Within such a relationship, the `PlanningEntity` is the _many_-side of the relationship and the `PlanningVariable` is the _one_-side.
+
+In our domain model, we can see that a process can be assigned to one computer, but a computer can host many processes. Hence, the `PlanningEntity` in our application is the `CloudProcess`, as shown in the diagram below:
+
+image:images/cloudBalanceClassDiagram_2.png[]
+
+. Open the `CloudProcess` class. It can be found in the `src/main/java` folder, in the package `org.optaplanner.examples.cloudbalancing.domain`.
+. Add the `@PlanningEntity` annotation to the class
++
+----
+@PlanningEntity
+@XStreamAlias("CloudProcess")
+public class CloudProcess extends AbstractPersistable {
+----
++
+. Save the file.
+. Run the `CloudBalancingSolverTest` unit-test class.
+
+The new output of our test is:
+
+----
+java.lang.IllegalStateException: The solutionClass (class org.optaplanner.examples.cloudbalancing.domain.CloudBalance) must have at least 1 member with a PlanningEntityCollectionProperty annotation or a PlanningEntityProperty annotation.
+
+----
+
+We need to instruct OptaPlanner where it can find the collection of PlanningEnities (in our case a collection of `CloudProcess`) which it needs to plan.
+Our `PlanningSolution` class, `CloudBalance`, is the class that contains our problem (and will hold our solution after planning), hence, we need to annotate the _getter_ method in our `CloudBalance` class that returns a `Collection<CloudProcess`.
+
+. Open the `CloudBalance` class.
+. Locate the method `getProcessList()`
+. Annotate the method with `@PlanningEnitityCollectionProperty`.
++
+----
+@PlanningEntityCollectionProperty
+public List<CloudProcess> getProcessList() {
+----
++
+. Save the file.
+. Run the `CloudBalancingSolverTest` unit-test class.
+
+The output shows:
+
+----
+The solutionClass (class org.optaplanner.examples.cloudbalancing.domain.CloudBalance) must have 1 member with a PlanningScore annotation. Maybe add a getScore() method with a PlanningScore annotation.
+----
+
+We need to tell OptaPlanner which field of the `PlanningSolution` class will contain the score of the solutions.
+
+. Open the `CloudBalance` class.
+. Locate the method `getScore()`
+. Annotate the method with `@PlanningScore`.
++
+----
+@PlanningScore
+public HardSoftScore getScore() {
+----
++
+. Save the file.
+. Run the `CloudBalancingSolverTest` unit-test class.
+
+The output shows:
+
+----
+The entityClass (class org.optaplanner.examples.cloudbalancing.domain.CloudProcess) should have at least 1 getter method or 1 field with a PlanningVariable annotation or a shadow variable annotation.
+----
+
+This indicates that we need to instruct OptaPlanner what the `PlanningVariable` is in our domain. As we've seen earlier in our class diagram, the `PlanningVariable` is the _one_-side of our _many-to-one_ relationship. Hence, our `PlanningVariable`, the variable that OptaPlanner can _play with_, is the `computer` attribute of our `CloudProcess` class.
+
+. Open the `CloudProcess` class.
+. Locate the method `getComputer()`.
+. Annotate the method with the `@PlanningVariable` annotation.
++
+----
+@PlanningVariable
+public CloudComputer getComputer() {
+----
++
+. Save the file.
+. Run the `CloudBalancingSolverTest` unit-test class.
+
+----
+The entityClass (class org.optaplanner.examples.cloudbalancing.domain.CloudProcess) has a PlanningVariable annotated property (computer) that has no valueRangeProviderRefs ([]).
+----
+
+The final piece of the puzzle is to instruct OptaPlanner where it can find the range of value for our `PlanningVariable`. This is done through a so called `ValueRangeProvider`. As with the `PlanningEntity`, the range of values for our `PlanningVariable` is going to be configured on our `PlanningSolution` class (note that this is not the only option, _ValueRangeProviders_ can also be defined on the `PlanningEntity` class in certain cases).
+Apart from specifying the `ValueRangeProvider` in the `PlanningSolution` class, we need to also specify the reference to this `ValueRanegProvider` in the `@PlanningVariable` annotation of our `PlanningEntity` class. This is needed because problem domains can have more than one `PlanningVariable`.
+
+. Open the `CloudBalance` class.
+. Locate the method `getComputerList()`.
+. Annotate the method with the `@ValueRangeProvider(id = "computerRange")`.
++
+----
+@ValueRangeProvider(id = "computerRange")
+public List<CloudComputer> getComputerList() {
+----
++
+. Save the file.
+. Next, open the `CloudProces` class.
+. Add the `valueRangeProviderRefs` attibute to the `PlanningVariable` annotation to reference the `computerRange` `ValueRangeProvider`.
++
+----
+@PlanningVariable(valueRangeProviderRefs = {"computerRange"})
+public CloudComputer getComputer() {
+----
++
+. Save the file.
+. Run the `CloudBalancingSolverTest` unit-test class.
+
+
+We can now see the test completing successfully.
+
+We have successfully imported and configured our domain model. However, we have not yet implemented our constraints that define the score of our solutions.
+When we look at the output log lines of our test, we see:
+
+----
+2019-08-16 13:26:02,754 [INFO] [main] [org.optaplanner.core.impl.solver.DefaultSolver] INFO  Solving ended: time spent (5000), best score (0hard/0soft), score calculation speed (5878/sec), phase total (2), environment mode (REPRODUCIBLE).
+----
+
+We see that the score is *(0hard/0soft)*. This is due to the fact that the imported project has a _skeleton_ `ScoreCalculator` defined.
+
+. Open the class `CloudBalancingEasyScoreCalculator`.It can be found in the `src/main/java` folder, in the package `org.optaplanner.examples.cloudbalancing.optional.score`.
+. Inspect the method `calculateScore`.
+
+As you can see, we simply return a _0hard/0soft_ score for every invocation. In the next section we will implement the constrains of our application.
+
+=== The Score
+
+OptaPlanner uses the _Score_ of a solution to determine whether a certain solution is better or worse than another solution.
+OptaPlanner provides different types of scores and scorelevels. Examples of different scores are:
+
+* `SimpleScore`: defines a single score level.
+* `HardSoftScore`: a score with 2 levels, a _hard_ score and a _soft_ score.
+* `HardMediumSoftScore`: a score with 3 levles, _hard_, _medium_, and _soft_.
+* `BendableScore`: a score with _n_-levels of constraints.
+
+Apart from the default score classes where the score is defined as an integer, there is also support for scores of different types, e.g. `HardSoftBigDecimalScore`, `HardMediumSoftLongScore`, etc.
+
+Depending on the type of solver you're building, you can have different requirements for a score.
+
+In this lab we will use a `HardSoftScore`. In this score:
+
+* hard constraints define constraints that must not be broken. A solution with broken hard-constraints is regarded as an _infeasible_ solution, and is therefore useless. An example of a hard constraint in our _Cloud Balancing_ example is the constraint that a computer should not be overloaded. I.e. the resource requirements of the processes deployed on a computer should not exceed the resources provided by the computer.
+* soft constraints define constraints that OptaPlanner must optimize on. For example, in our _Cloud Balancing_ example, the total costs of the computers required to run our processes should be as low as possible.
+
+When comparing scores of solutions that have multiple score levels, the scores are compared from the highest score level to the lowest. E.g. in a HardSoftScore, the hard-scores are compared, and after that the soft-scores, as illustrated below:
+
+image:images/scoreComparisonCloudBalancing.png[]
+
+In an OptaPlanner solution, the `ScoreCalculator` is responsible for calculating the score of a solution. OptaPlanner supports multiple `ScoreCalculator` implemetations:
+
+* _Easy Java score calculation_: Implement all constraints together in a single method in Java (or another JVM language). Does not scale.
+* _Incremental Java score calculation_ (*not recommended*): Implement multiple low-level methods in Java (or another JVM language). Fast and scalable. Very difficult to implement and maintain.
+* _Drools score calculation_: Implement each constraint as a separate score rule in DRL. Scalable.
+
+The most common implementation of the `ScoreCalculator` and constraint rules is _Drools_, for the reason that constraint rules are relatively easy to implement, as well as the native _incremental score calculation_ semantics that Drools provides, which is important for performance, and therefore solution quality and scalability reasons.
