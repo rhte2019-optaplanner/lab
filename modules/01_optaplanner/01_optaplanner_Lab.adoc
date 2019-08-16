@@ -462,4 +462,6 @@ In an OptaPlanner solution, the `ScoreCalculator` is responsible for calculating
 * _Incremental Java score calculation_ (*not recommended*): Implement multiple low-level methods in Java (or another JVM language). Fast and scalable. Very difficult to implement and maintain.
 * _Drools score calculation_: Implement each constraint as a separate score rule in DRL. Scalable.
 
-The most common implementation of the `ScoreCalculator` and constraint rules is _Drools_, for the reason that constraint rules are relatively easy to implement, as well as the native _incremental score calculation_ semantics that Drools provides, which is important for performance, and therefore solution quality and scalability reasons.
+The most common implementation of the `ScoreCalculator` and constraint rules is _Drools_, for the reason that constraint rules are relatively easy to implement, as well as the native _incremental score calculation_ semantics that Drools provides, which is important for performance, and therefore solution quality and scalability reasons. Hence, we will write our constraint rules in Drools.
+
+. in 
