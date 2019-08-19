@@ -677,7 +677,9 @@ If everything works correctly, you should see the following output when the _Sol
 
 We can see that the have a score of (_0hard/-7410). From the logs we can also see that this is the same score as the score after the end of the `Construction Heuristics` phase, which implies that the `LocalSearch` phase, the second phase that the solve runs, did not find any better solutions.
 
-In this case, this is caused by the fact that the data-set we're loading is relatively small. We're running the unit-test with a data-set that contains only 4 computers and 12 processes. To really see OptaPlanner in action, we need to use a bigger dataset. We have added a dataset with 100 computers and 300 processes to the lab. The next exercise is to use this dataset in our test.
+In this case, this is caused by the fact that the data-set we're loading is relatively small. We're running the unit-test with a data-set that contains only 4 computers and 12 processes. To really see OptaPlanner in action, we need to use a bigger dataset. We have added a dataset with 100 computers and 300 processes to the lab. The other cause of not finding a better solution is that the solver is automatically terminated after 5 seconds (500ms) by the termination config.
+
+The next exercise is to use this dataset in our test.
 
 === Solver API
 
@@ -699,3 +701,78 @@ After this, OptaPlanner will start solving the given data-set. Without any confi
 * configure a _termination strategy_ in the solver configuration.
 
 In this lab we've configured a termination strategy that stops the solver after 5 seconds (5000ms).
+
+Let's first change the data-set file to a larger data-set and set the _termination configuration to 30 seconds.
+
+. Open the `CloudBalancingSolverTest`.
+. In the `testSolver` method, change the input file to point to the data-set with 100 computers and 300 processes.
++
+----
+File inputFile = new File("data/cloudbalancing/unsolved/100computers-300processes.xml");
+----
++
+. Save the file.
+. Open the `cloudBalancingSolverConfig.xml`.
+. Increase the `millisecondsSpentLimit` to 30000:
++
+----
+<millisecondsSpentLimit>30000</millisecondsSpentLimit>
+----
++
+. Save the file.
+. Run the Maven build, which will run the unit tests.
+
+If all is well, you will see the following lines in your log:
+
+----
+2019-08-19 16:56:12,969 [DEBUG] [main] [org.optaplanner.examples.cloudbalancing.optional.event.DebugSolverEventListener] DEBUG New best solution found: (0hard/-129410soft)
+----
+
+These lines indicate that OptaPlanner is finding better and better solutions while it's running. The best score after this run of 30 seconds on my current system is:
+
+----
+2019-08-19 17:09:20,655 [INFO] [main] [org.optaplanner.core.impl.localsearch.DefaultLocalSearchPhase] INFO  Local Search phase (1) ended: time spent (30000), best score (0hard/-118790soft), score calculation speed (27999/sec), step total (124839).
+----
+
+I.e. a score of 0hard and -118790 soft. As a demonstration, let's give OptaPlanner a bit more time to find an even better solution.
+
+. Open the `cloudBalancingSolverConfig.xml` file.
+. Set the termination configuration to 60 seconds:
++
+----
+<millisecondsSpentLimit>60000</millisecondsSpentLimit>
+----
++
+. Save the file.
+. Run the Maven build, which will run the unit tests.
+
+When we now look at the output, we can see that OptaPlanner has found an even better solution.
+
+----
+2019-08-19 17:17:27,059 [INFO] [main] [org.optaplanner.core.impl.solver.DefaultSolver] INFO  Solving ended: time spent (60000), best score (0hard/-116750soft), score calculation speed (30033/sec), phase total (2), environment mode (REPRODUCIBLE).
+----
+
+This time the best score is 0hard, -116750soft.
+
+So, how much time should you give OptaPlanner to solve your problem? There is no real rule-of-thumb. It depends on a lot of factors:
+
+* problem size/space.
+* score calculation count (how many calculations per second your OptaPlanner solution is able to perform)
+* your hardware
+* multi-threading
+
+What you typically see in an OptaPlanner implementation is that within the first few minutes, a `Solver` will quickly find better and better solutions, but this will become harder and harder the longer the `Solver` is running.
+The recommendation is to start benchmarking your solution as early as possible to identify where this point of diminishing returns is for your given application.
+
+In the next (extra) lab, you will be creating the OptaPlanner Benchmark report.
+
+
+==== Extra: The OptaPlanner Benchmark
+
+In this extra lab you will create an OptaPlanner Benchmark report. OptaPlanner Benchmarker can be used to benchmark:
+
+* different algorithms.
+* different algorithm configurations.
+* different datasets.
+
+... and a combination of the above. It's an excellent tool to benchmark your solution and to create a report that indicates if your OptaPlanner solution peforms as expected and how to _power tweak_ your solution to create even better solutions to your problem than you already have (notice that a 2% better score can mean a substantial amount of resources and/or money in a real world application).
