@@ -464,4 +464,238 @@ In an OptaPlanner solution, the `ScoreCalculator` is responsible for calculating
 
 The most common implementation of the `ScoreCalculator` and constraint rules is _Drools_, for the reason that constraint rules are relatively easy to implement, as well as the native _incremental score calculation_ semantics that Drools provides, which is important for performance, and therefore solution quality and scalability reasons. Hence, we will write our constraint rules in Drools.
 
-. in 
+If you've successfully completed the lab until now, and have a correctly annotated domain model, you can continue using the same project in your CodeReady Workspaces environment for this project. You can also import the project for this lab from this location: https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-2
+
+. In the package `org.optaplanner.examples.cloudbalancing.solver` in the `src/main/resources` folder, add a new file with the name `cloudBalancingScoreRules.drl`.
+. Add the following lines to the DRL file you've just created. This defines the package name of the file, the import of types requires in our score rules, and a global variable that references the `Score`.
++
+----
+package org.optaplanner.examples.cloudbalancing.solver;
+
+import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScoreHolder;
+
+import org.optaplanner.examples.cloudbalancing.domain.CloudBalance;
+import org.optaplanner.examples.cloudbalancing.domain.CloudComputer;
+import org.optaplanner.examples.cloudbalancing.domain.CloudProcess;
+
+global HardSoftScoreHolder scoreHolder;
+----
++
+. Save the file.
+. In the same folder, open the `cloudBalancingSolverConfig.xml` file. This file contains the configuration of our _Solver_, like the _scoreDirectorFactory_ to use (which defined which type of _score calculator_ is issues), the _termination configuration (which defines when OptaPlanner should stop the _Solver_), the heuristic algorithms to use, etc.
+. Locate the `scoreDirectorFactory` configuration. This is currently set to `easyScoreCalculatorClass`. Replace the `easyScoreCalculatorClass` configuration with the following line. This configures the Drools Rules file to be used, and should point to the file we've just created.
++
+----
+<scoreDrl>org/optaplanner/examples/cloudbalancing/solver/cloudBalancingScoreRules.drl</scoreDrl>
+----
++
+. Now that we're using Drools, we need to instruct OptaPlanner which _problem facts_ need to be added to the Drools _Working Memory_. `PlanningEntity` instances are added by default, but the `PlanningVariables` need to be configured. Open the `CloudBalance` file and locate the method `getComputerList()`. Add the `@ProblemFactCollectionProperty` to this method:
++
+----
+@ValueRangeProvider(id = "computerRange")
+@ProblemFactCollectionProperty
+public List<CloudComputer> getComputerList() {
+----
++
+. Save the file.
+. Execute the `CloudBalancingSolverTest` by runnning a Maven build.
+
+If the tests have run successfully, the output should show the following:
+
+----
+2019-08-19 10:26:04,648 [INFO] [main] [org.optaplanner.core.impl.solver.DefaultSolver] INFO  Solving ended: time spent (5072), best score (0hard/0soft), score calculation speed (683/sec), phase total (2), environment mode (REPRODUCIBLE).
+
+----
+
+We can see that the score is still _0hard/0soft_, as we have not implemented any constraint rules yet.
+
+=== Implementing Constraint Rules
+
+We will now implement our rules. Our problem domain defines 2 score, and thus constraint, levels:
+
+* Hard Constraints: constraints that should not be broken. A broken hard constraint indicates an infeasible solution.
+* Soft Constraints: constraints on which we should Optimize
+
+==== Hard Constraints
+
+Hard constraints identify an infeasible solution. In our case, a solution is infeasible if the amount of resources required by the processes assigned to a computer exceeds the available resources of the computer. We have identified 3 types of resources:
+
+* CPU
+* Memory
+* Network Bandwidth
+
+As such, we have 3 hard constraint rules, one for each resource type. We will implement the hard constraint rule for the _CPU_. After that, you can use the same approach for the _Memory_ and _Network Bandwidth_.
+
+The requirement of the rule is as follows: The _CPU power_ required by all the _CloudProcesses_ assigned to a _CloudComputer_ should not exceed the _CPU Power_ of the _CloudComputer.
+
+. Open the `cloudBalancingScoreRules.drl` file.
+. Add the following skeleton rule. The consequence of the rule adds a hard constraint with value `0` to the score. We will replace that value later with the real hard constraint value:
++
+----
+rule "requiredCpuPowerTotal"
+when
+
+then
+  scoreHolder.addHardConstraintMatch(kcontext, 0);
+end
+----
++
+. First we need to define a construct to collect all the `CloudProcess` instances that have been assigned to the same `CloudComputer`. To do this, we first match the `CloudComputer`:
++
+----
+rule "requiredCpuPowerTotal"
+when
+  $computer : CloudComputer($cpuPower : cpuPower)
+then
+  scoreHolder.addHardConstraintMatch(kcontext, 0);
+end
+----
++
+. Simply said, we say that when a `CloudComputer` is _matched_, we assign it to the variable `$computer` and we assign the `cpuPower` field of this computer to the variable `$cpuPower`. The variable assignment is required so we can reference these variables in other parts of our rule, for example in aditional constraints or in the score calculation in the consequence of the rule.
+. With our `CloudComputer` matched, we now need to colect all the `CloudProcess` instances that have been assigned to this `CloudComputer`. For this we can use the Drools `accumulate` construct.
++
+----
+rule "requiredCpuPowerTotal"
+when
+  $computer : CloudComputer($cpuPower : cpuPower)
+  accumulate(
+    CloudProcess(computer == $computer, $requiredCpuPower: requiredCpuPower);
+  )
+then
+  scoreHolder.addHardConstraintMatch(kcontext, 0);
+end
+----
++
+. The `accumulate` definition is not complete yet. Although we have now _accumulated_ all the `CloudProcess` instances that have been assigned to the given _CloudComputer_, we still need to apply a, so called, _accumulate_ function and a constraint. In our case, we want to _sum_ the `$requiredCpuPower` of all process and check if this _sum_ exceeds the available `$cpuPower` of the `CloudComputer` instance. In that case, the rule should _fire_.
++
+----
+rule "requiredCpuPowerTotal"
+when
+  $computer : CloudComputer($cpuPower : cpuPower)
+  accumulate(
+    CloudProcess(computer == $computer, $requiredCpuPower: requiredCpuPower);
+    $requiredCpuPowerTotal: sum($requiredCpuPower);
+    $requiredCpuPowerTotal > $cpuPower
+  )
+then
+  scoreHolder.addHardConstraintMatch(kcontext, 0);
+end
+----
++
+. Finally, we should add the hard constraint score when the rule fires. The score should be the amount of _missing_ resources, and not simply `-1`, because a solution in which a computer lacks 4 CPUs is far worse than a solution where a computer lacks just a single CPU. Hence the full score rule is defined as:
++
+----
+rule "requiredCpuPowerTotal"
+when
+  $computer : CloudComputer($cpuPower : cpuPower)
+  accumulate(
+    CloudProcess(computer == $computer, $requiredCpuPower: requiredCpuPower);
+    $requiredCpuPowerTotal: sum($requiredCpuPower);
+    $requiredCpuPowerTotal > $cpuPower
+  )
+then
+  scoreHolder.addHardConstraintMatch(kcontext, $cpuPower - $requiredCpuPowerTotal);
+end
+----
++
+. Save the DRL file and run the build, which will also execute our tests.
+
+We can now implement the other two hard constraints, the constraints for the memory and network bandwidth.
+
+. Open the DRL file.
+. Add 2 new hard constraint rules. Call them `requiredMemoryTotal` and `requiredNetWorkBandwidthTotal`.
+. Implement the rules in exactly the same way as the rule for the CPU power.
+. Save the DRL file and run a Maven build, which will execute the tests.
+
+With the hard constraints implemented, it's now time to implement the _soft Constraints
+
+==== Soft constraints
+
+The _soft constraints_ are the constraints on which we want to optimize. I.e. they define the _goal_ or our planning problem. In the case of our _Cloud Balancing_ example, our goal is to place the the processes on the computers in such a way that we minimize the costs. In other words, we need to calculate the total cost of the `CloudComputer` instances we're actively using, instances that have at least 1 `CloudProcess` assigned to them.
+
+. Open the DRL file.
+. Add the following skeleton rule. The consequence of the rule adds a soft constraint with value `0` to the score. We will replace that value later with the real soft constraint value:
++
+----
+rule "computerCost"
+when
+
+then
+  scoreHolder.addSoftConstraintMatch(kcontext, 0);
+end
+----
++
+
+Intuatively, people will write a rule that matches a `CloudComputer` with a `CloudProcess`, and sets the `cost` of this `CloudComputer` as the soft constraint score, as such:
++
+----
+rule "computerCost"
+when
+  $computer : CloudComputer($cost : cost)
+  CloudProcess(computer == $computer)
+then
+  scoreHolder.addSoftConstraintMatch(kcontext, 0);
+end
+----
++
+The problem with this rule is that if a `CloudComputer` has two or more `CloudProcess` instances assigned to it, this rule will match for each of these combinations, adding the `cost` of the `CloudComputer` multiple times to the soft score.
+
+A solution to this is to use the Drools 'exists' keyword, which creates a single match if at least a combination of `CloudProcess` and `CloudComputer` exists.
+
+. Go back to the DRL file and add the constraints (left-hand side) to the rule:
++
+----
+rule "computerCost"
+when
+  $computer : CloudComputer($cost : cost)
+  exists CloudProcess(computer == $computer)
+then
+  scoreHolder.addSoftConstraintMatch(kcontext, 0);
+end
+----
++
+. Finally, use the negation of the `cost` attribute of the `CloudComputer` as the soft score.
++
+----
+rule "computerCost"
+when
+  $computer : CloudComputer($cost : cost)
+  exists CloudProcess(computer == $computer)
+then
+  scoreHolder.addSoftConstraintMatch(kcontext, - $cost);
+end
+----
++
+. Save the DRL file and run a Maven build, which also will run the tests.
+
+If everything works correctly, you should see the following output when the _Solver_ test completes:
+
+----
+2019-08-19 14:46:24,052 [INFO] [main] [org.optaplanner.core.impl.solver.DefaultSolver] INFO  Solving ended: time spent (5000), best score (0hard/-7410soft), score calculation speed (4780/sec), phase total (2), environment mode (REPRODUCIBLE).
+
+----
+
+We can see that the have a score of (_0hard/-7410). From the logs we can also see that this is the same score as the score after the end of the `Construction Heuristics` phase, which implies that the `LocalSearch` phase, the second phase that the solve runs, did not find any better solutions.
+
+In this case, this is caused by the fact that the data-set we're loading is relatively small. We're running the unit-test with a data-set that contains only 4 computers and 12 processes. To really see OptaPlanner in action, we need to use a bigger dataset. We have added a dataset with 100 computers and 300 processes to the lab. The next exercise is to use this dataset in our test.
+
+=== Solver API
+
+So far, we've seen the _Domain Model_ and the _Constraint Rules_ of an OptaPlanner application. We've tested our project by using the provided `CloudBalanceSolverTest`. In this part of the lab we will look at the API that OptaPlanner provides to configure and build a `Solver`, and to run the `Solver` against a given data-set. We will do this by inspecting the provided `CloudBalanceSolverTest` unit-test.
+
+. Open the `CloudBalanceSolverTest` file, which can be found in the package `org.optaplanner.examples.cloudbalancing` in the `src/test/java` folder.
+. Locate the `testSolver()` method.
+
+The `testSolver` method shows the basic API to interact with OptaPlanner. There are basically {x} steps.
+
+. Create a `SolverFactory` from a solver configuration file, in this case the file `cloudBalancingSolverConfig.xml`.
+. Build a `Solver` from the `SolverFactory`.
+. Load the data-set into an instance of your `PlanningSolution`. In this case we use a `Repository` class that provides functionality to load a `CloudBalance` data-set from a file.
+. Call the `Solver.solve(...)` method and provide the `PlanningSolution` instance.
+
+After this, OptaPlanner will start solving the given data-set. Without any configuration, OptaPlanner will run indefinitely (as NP-Complete problems are by definition not solvable in polynomial time). To stop the solving of OptaPlanner you either:
+
+* call `Solver.terminateEarly()` from another thread.
+* configure a _termination strategy_ in the solver configuration.
+
+In this lab we've configured a termination strategy that stops the solver after 5 seconds (5000ms).
