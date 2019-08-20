@@ -434,24 +434,24 @@ As you can see, we simply return a _0hard/0soft_ score for every invocation. In 
 
 === The Score
 
-OptaPlanner uses the _Score_ of a solution to determine whether a certain solution is better or worse than another solution.
-OptaPlanner provides different types of scores and scorelevels. Examples of different scores are:
+OptaPlanner uses the _score_ of a solution to determine whether a certain solution is better or worse than another solution.
+OptaPlanner provides different types of scores and score-levels. Examples of different scores are:
 
 * `SimpleScore`: defines a single score level.
 * `HardSoftScore`: a score with 2 levels, a _hard_ score and a _soft_ score.
 * `HardMediumSoftScore`: a score with 3 levles, _hard_, _medium_, and _soft_.
 * `BendableScore`: a score with _n_-levels of constraints.
 
-Apart from the default score classes where the score is defined as an integer, there is also support for scores of different types, e.g. `HardSoftBigDecimalScore`, `HardMediumSoftLongScore`, etc.
+Apart from the default score classes, in which the score is defined as an integer, there is also support for scores of different types, e.g. `HardSoftBigDecimalScore`, `HardMediumSoftLongScore`, etc.
 
 Depending on the type of solver you're building, you can have different requirements for a score.
 
 In this lab we will use a `HardSoftScore`. In this score:
 
-* hard constraints define constraints that must not be broken. A solution with broken hard-constraints is regarded as an _infeasible_ solution, and is therefore useless. An example of a hard constraint in our _Cloud Balancing_ example is the constraint that a computer should not be overloaded. I.e. the resource requirements of the processes deployed on a computer should not exceed the resources provided by the computer.
-* soft constraints define constraints that OptaPlanner must optimize on. For example, in our _Cloud Balancing_ example, the total costs of the computers required to run our processes should be as low as possible.
+* _hard constraints_ define constraints that must not be broken. A solution with broken hard-constraints is regarded as an _infeasible_ solution, and is therefore useless. An example of a hard constraint in our _Cloud Balancing_ example is the constraint that a computer should not be overloaded. I.e. the resource requirements of the processes deployed on a computer should not exceed the resources provided by the computer.
+* _soft constraints_ define constraints that OptaPlanner must optimize on. For example, in our _Cloud Balancing_ example, the total costs of the computers required to run our processes should be as low as possible. The sum of the costs of all required computers is therefore a soft constraint
 
-When comparing scores of solutions that have multiple score levels, the scores are compared from the highest score level to the lowest. E.g. in a HardSoftScore, the hard-scores are compared, and after that the soft-scores, as illustrated below:
+When comparing scores of solutions that have multiple score levels, the scores are compared from the highest score level to the lowest. E.g. in a HardSoftScore, first the hard-scores are compared, and after that the soft-scores, as illustrated below:
 
 image:images/scoreComparisonCloudBalancing.png[]
 
@@ -461,7 +461,7 @@ In an OptaPlanner solution, the `ScoreCalculator` is responsible for calculating
 * _Incremental Java score calculation_ (*not recommended*): Implement multiple low-level methods in Java (or another JVM language). Fast and scalable. Very difficult to implement and maintain.
 * _Drools score calculation_: Implement each constraint as a separate score rule in DRL. Scalable.
 
-The most common implementation of the `ScoreCalculator` and constraint rules is _Drools_, for the reason that constraint rules are relatively easy to implement, as well as the native _incremental score calculation_ semantics that Drools provides, which is important for performance, and therefore solution quality and scalability reasons. Hence, we will write our constraint rules in Drools.
+The most common implementation of the `ScoreCalculator` and constraint rules is _Drools_, for the reason that the native _incremental score calculation_ semantics of Drools implicitly provides performance and scalability. Hence, we will write our constraint rules in Drools.
 
 If you've successfully completed the lab until now, and have a correctly annotated domain model, you can continue using the same project in your CodeReady Workspaces environment for this project. You can also import the project for this lab from this location: https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-2
 
@@ -481,7 +481,11 @@ global HardSoftScoreHolder scoreHolder;
 ----
 +
 . Save the file.
-. In the same folder, open the `cloudBalancingSolverConfig.xml` file. This file contains the configuration of our _Solver_, like the _scoreDirectorFactory_ to use (which defined which type of _score calculator_ is issues), the _termination configuration (which defines when OptaPlanner should stop the _Solver_), the heuristic algorithms to use, etc.
+. In the same folder, open the `cloudBalancingSolverConfig.xml` file. This file contains the configuration of our _Solver_, like:
+    * the _scoreDirectorFactory_ to use (which defines which type of _score calculator_ is used).
+    * the _termination configuration (which defines when OptaPlanner should stop the _Solver_).
+    * the heuristic algorithms to use.
+    * etc.
 . Locate the `scoreDirectorFactory` configuration. This is currently set to `easyScoreCalculatorClass`. Replace the `easyScoreCalculatorClass` configuration with the following line. This configures the Drools Rules file to be used, and should point to the file we've just created.
 +
 ----
@@ -499,7 +503,7 @@ public List<CloudComputer> getComputerList() {
 . Save the file.
 . Execute the `CloudBalancingSolverTest` by runnning a Maven build.
 
-If the tests have run successfully, the output should show the following:
+If the test has ran successfully, the output should show the following:
 
 ----
 2019-08-19 10:26:04,648 [INFO] [main] [org.optaplanner.core.impl.solver.DefaultSolver] INFO  Solving ended: time spent (5072), best score (0hard/0soft), score calculation speed (683/sec), phase total (2), environment mode (REPRODUCIBLE).
@@ -625,7 +629,7 @@ end
 ----
 +
 
-Intuatively, people will write a rule that matches a `CloudComputer` with a `CloudProcess`, and sets the `cost` of this `CloudComputer` as the soft constraint score, as such:
+Intuitively, people will write a rule that matches a `CloudComputer` with a `CloudProcess`, and sets the `cost` of this `CloudComputer` as the soft constraint score, as such:
 +
 ----
 rule "computerCost"
