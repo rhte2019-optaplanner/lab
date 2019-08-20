@@ -8,9 +8,9 @@
 
 Almost every organization has to deal with planning problems to perform its business operations. Whether its transporting goods from a warehouse to stores, assigning employees to shifts, inspecting and servicing vehicles, or allocating tasks to departments, the more efficient and effective these tasks can be performed, the bigger the competitive advantage of an organization will be.
 
-The aforementioned planning problems fall in a category of problems that are, in the academic world, known as NP-Complete and/or NP-Hard problems. What this in essence means is that there is no known algorith to solve these problems in polynomial time. Whenever the problem space of a problem grows, the time to find the solution to these problems grows exponentially.
+The aforementioned planning problems fall in a category of problems that are, in the academic world, known as NP-Complete problems. What this in essence means is that there is no known algorithm to solve these problems in polynomial time. Whenever the problem space of a problem grows, the time to find the solution to these problems grows exponentially.
 
-As an example take the CloudBalance problem, in which computer processes/workloads need to be assigned to computers. For a problem in which we need to assign 300 processes to 100 computers, the amount of possible solutions is 100 ^ 300, which is equal to 10^600. Compare this to the number of atoms in the observable universe, which is 10^80, and one can see the vastness of the solution space of these kind of problems.
+As an example take the _Cloud Balancing_ problem, in which computer processes/workloads need to be assigned to computers. For a problem in which we need to assign 300 processes to 100 computers, the number of possible solutions is 100 ^ 300, which is equal to 10^600. Compare this to the number of atoms in the observable universe, which is 10^80, and one can easily see the vastness of the solution space of these kind of problems.
 
 image::images/cloudBalanceSearchSpaceSize-2.png[]
 
@@ -20,39 +20,42 @@ In this lab you will be introduced to OptaPlanner/Business Optimizer, Red Hat’
 
 *Tools*
 
-Most of the tools required will be provided in your by CodeReady WorkSpaces environment. The tools you need locally are:
+Most of the tools required will be provided in your by CodeReady Workspaces environment. The tools you need locally are:
 
 * a browser (Chrome, Firefox)
 
 *Skills*
 
-* OpenShift Basics, familiarity with `oc` CLI tool and the OpenShift web console
-* Familiarity with Unix command line and terminal based text editors
-* Familiarity with IDEs, like Eclipse, IntelliJ.
+* Familiarity with IDEs, like Eclipse, IntelliJ, Visual Studio Code, CodeReady Workspaces.
 * Java
 * Maven
 
+NOTE: This lab can also be done in your own IDE of choice (Eclipse, IntelliJ, VSCode) on your own machine, as long as you have JDK 8 and Maven installed. There is no dependency on CodeReady Workspaces and/or OpenShift. All lab materials are provided as standard Maven projects on GitHub.
+
 == Glossary
 
-*OptaPlanner*: The open source AI Constraint Satisfaction Solver: https://www.optaplanner.org
+*OptaPlanner*: The open source AI Constraint Solver: https://www.optaplanner.org
 
 *CodeReady Workspaces*: the cloud-native Integrated Development Environment on OpenShift.: https://developers.redhat.com/products/codeready-workspaces/overview
 
 == Goals and learning objectives
 
 * Understand what planning problems are.
-* Understand how OptaPlanner can provide optimal solutions to these kind of problems using advanced A/I Heuristic Algorithms.
-* Develop an OptaPlanner domain model for the _CloudBalancing_ problem.
-* Write constraint rules for the _CloudBalancing_ problem.
+* Understand how OptaPlanner can provide optimal solutions to these kind of problems using advanced A.I. Heuristic Algorithms.
+* Annotate an OptaPlanner domain model for the _Cloud Balancing_ problem.
+* Write constraint rules for the _Cloud Balancing_ problem.
+* Understand the OptaPlanner API.
+* Optional: learn how to use the OptaPlanner Benchmarker.
+
 
 == What is a Planning Problem?
 
 A planning problem is a problem in which you want to:
-* Optimize *Goals*
-* With limited *Resources*
-* Under *Constraints*
+
+image:images/planning-problems.png[]
 
 Examples of known planning problems are:
+
 * Vehicle Routing (VRP)
 * Shift Assignment
 * Employee Rostering
@@ -60,12 +63,14 @@ Examples of known planning problems are:
 * Hospital Bed Planning
 * Exam Scheduling
 
-In all of these examples, there is a certain goal, e.g. reduce fuel cost. There are resources, e.g. vehicles. And there are constraints, e.g. the maximum vehicle capacity. OptaPlanner takes all these facts into account and will use A/I heuritics algorithms to find the optimal solution to such a given problem.
-Constraints, their level and their weights can be easily altered, allowing the user full flexibility on what he/she wants to optimize on. For example, purely optimizing on costs can have negative downsides on other areas, like employee well-being or CO2 emissions.
+In all of these examples, there is a certain goal, e.g. "reduce fuel costs". There are resources, e.g. "vehicles". And there are constraints, e.g. "the maximum vehicle capacity".
+
+OptaPlanner takes all these facts into account and will use A.I. heuritics algorithms to find the optimal solution to a given problem.
+Constraints, their level, and their weights, can be easily altered, giving the user full flexibility on what he/she wants to optimize on. For example, purely optimizing on costs can have negative consequences in other areas, like employee well-being or CO2 emissions. By providing the ability to users to configure the area in which they want to optimize, OptaPlanner gives users full flexibility and control over their use-case.
 
 == Use Case
 
-The use case for this lab is the _CloudBalancing_ problem. The _CloudBalancing_ problem is a problem in which we need to assign computer _processes/workloads_ to a set of _computers_.
+The use case for this lab is the _Cloud Balancing_ problem. The _Cloud Balancing_ problem is a problem in which we need to assign computer _processes/workloads_ to a set of _computers_.
 
 image::images/cloudBalanceUseCase.png[]
 
@@ -79,9 +84,9 @@ image::images/integrationOverview.png[]
 OptaPlanner solutions can be run on premise and in the cloud, as nightly (batch) planning engine, as well as realtime planning engine.
 This flexibility allows users to architect, design and implement an OptaPlanner solution specifically for their problem, their needs and their environment.
 
-As OptaPlanner is a Java-based platform, OptaPlanner solutions are build in Java. This means that the problem's domain model can be defined and written as simple PoJo, and constraint rules can be written in either Java or in Drools, the open-source business rules engine.
+As OptaPlanner is a Java-based platform, OptaPlanner solutions are, obviously, built in Java. This means that the problem's _domain model_ can be defined and written as simple PoJo, and constraint rules can be written in either Java or in Drools, the open-source business rules engine.
 
-In this lab we will simply use OptaPlanner as library runnning in our IDE. Data will be loaded from, and written to, a spreadsheet (Excel). We will build and run the planning engine from our IDE.
+In this lab we will simply use OptaPlanner as a library runnning in our IDE. Data will be loaded from, and written to, an XML file. We will build and run the planning engine from our IDE.
 
 
 == Lab Material
@@ -92,28 +97,29 @@ The lab material is hosted on GitHub, at the following URL:
 
 The material consists of a number of git repositories:
 
-* *cloud-balancing-lab-step-1*
-* *cloud-balancing-lab-step-2*
-* *cloud-balancing-lab-step-3*
+* *cloud-balancing-lab-step-1*: https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-1
+* *cloud-balancing-lab-step-2*: https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-2
+
 
 These Git repositories represent different stages within the lab. As we you only have 120 minutes to finnish the lab, some parts of the application have already been pre-defined for you in each step.
 
 
 == Code Walkthrough
 
-Given the limited time we have for this lab, we will provide you with the full domain model of our _CloudBalance_ problem. Your tasks will be to:
+Given the limited amount of time we have for this lab, we will provide you with the full domain model of our _Cloud Balancing_ problem. Your tasks will be to:
 
-* annotate the domain model with the correct OptaPlanner annotations that instruct the engine which roles the specific classes of our domain play in our solution.
-* write the logic to load the problem data and start the OptaPlanner planning engine.
-* write the constraints of the solution that instruct OptaPlanner on what to optimize.
+* annotate the domain model with the correct OptaPlanner annotations that instruct the engine which roles the specific classes of our model play in our solution.
+* write the constraint rules of the solution that instruct OptaPlanner on what to optimize.
+* optional: create an OptaPlanner Benchmarker.
 
-The class diagram of our _CloudBalance_ problem domain looks as follows:
+The class diagram of our _Cloud Balance_ problem domain looks as follows:
 
 image::images/cloudBalanceClassDiagram_1.png[]
 
 There are 2 classes:
-* Process: the computer process/workload to run
-* Computer: the computer on which to run the process
+
+* `Process`: the computer process/workload to run.
+* `Computer`: the computer on which to run the process.
 
 A _Process_ has requirements in terms of required resources:
 * Computer
@@ -123,28 +129,17 @@ A _Process_ has requirements in terms of required resources:
 
 A _Computer_ provides a certain amount of resources (CPU, Memory, Network Bandwidth) and has a certain cost.
 
-The goal is to create a planning solution that places processes on computers in such a way that:
-* Computers do not get overloaded. I.e. the amount of resources required by the _Processes_ placed on the _Computer_ does not exceed the available resources of the _Computer_.
+The goal is to create a planning solution that places _processes_ on _computers_ in such a way that:
+
+* Computers do not get overloaded. I.e. the amount of resources required by the processes placed on the computer does not exceed the available resources of the computer.
 * Minimize the total cost of the required computers.
 
 
-
-NOTE: Bla Bla
-
-WARNING: In the OpenShift lab environment, which has limited resources, the login to jenkins might take a while and can eventually time out. If this is the case, you can skip the next step and safely continue with the remainder of the lab - the deployment of the application services.
-
-This is nice as well:
-
-----
-this is nice as well <1>
-----
-<1> see how nice that is!!
-
 == OpenShift Environment
 
-An shared Openshift environment is provided. In this OpenShift environment we have deployed a _CodeReady Workspaces_ environment: A collaborative Kubernetes-native development solution that delivers OpenShift workspaces and in-browser IDE for rapid cloud application development.
+A shared Openshift environment is provided. In this OpenShift environment we have deployed a _CodeReady Workspaces_ environment: a collaborative Kubernetes-native development solution that delivers OpenShift workspaces and in-browser IDE for rapid cloud application development.
 
-Details about the environment are obtained through the Red Hat Summit _GuidGrabber_.
+Details about the environment are obtained through the Red Hat Tech Exchange _GuidGrabber_.
 
 . In a browser window, navigate to http://bit.ly/summit-guidgrabber.
 +
@@ -180,6 +175,7 @@ Red Hat CodeReady Workspaces provides:
 - Plugins for languages, framework, and tools
 - An SDK for creating plugins and assemblies
 
+NOTE: The CodeReady Workspaces environment has been provisioned for you so that can run the labs in a pre-provisioned environment. However, you can also run the labs on your own laptop, provided that you have an IDE, JDK 8+, Maven and Git tools installed. There is no dependency on CodeReady Workspaces and/or OpenShift. All lab materials are provided as standard Maven projects on GitHub.
 
 ## Accessing CodeReady Workspaces
 
@@ -191,11 +187,11 @@ A CodeReady Workspaces environment has been created for every workshop user. To 
 - An _Authorize Access_ screen will be presented. Leave `user_full` checkbox checked and click on `Allow selected permissions`.
     image:images/codeready-authorize-access.png[]
 - In the next screen, provide additional user information. This can be dummy information for this workshop.
-    images:image/codeready-user-information.png[]
+    image:images/codeready-user-information.png[]
 
 CodeReady Workspaces will open and show the initial screen.
 
-image:images:codeready-initial-screen.png[]
+image:images/codeready-initial-screen.png[]
 
 
 ### Importing the Project
@@ -207,13 +203,13 @@ In the initial screen, the `New Workspace` screen, that the platform provides us
 1. Provide a name for your workspace, postfixed by your username. E.g, `cloud-balancing-user1` if you're username is `user1`.
 2. Select the _stack_. In this case we select `Java 1.8`.
 3. Set the RAM (memory) of the `dev-machine` to 2GB (default value).
-4. Click on `Create and Open` button to create the workspace.
+4. Click on _'Create and Open'_ button to create the workspace.
     image:images/codeready-new-workspace.png[]
-5. When the workspace has been created, click on `Import Project`.
+5. When the workspace has been created, click on _'Import Project'_.
     image:images/codeready-workspace-created.png[]
-6. In the _Import Project_ window, select `GITHUB` as the _Version Control System_, set the URL to `https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-1` and click on the _Import_ button.
+6. In the _'Import Project'_ window, select `GITHUB` as the _Version Control System_, set the URL to `https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-1` and click on the _'Import'_ button.
     image:images/codeready-workspaces-import-lab1.png[]
-7. In the _Project Configuration_ screen, select `Maven` and click the _Save_ button.
+7. In the _'Project Configuration'_ screen, select `Maven` and click the _'Save'_ button.
 
 Our imported project is our base _Cloud Balancing_ project. It contains:
 
@@ -222,7 +218,7 @@ Our imported project is our base _Cloud Balancing_ project. It contains:
 * an empty `ScoreCalculator`. This component is responsible for calculating the _score_ of the solution.
 * a _repository_ class responsible for loading the problem data from the filesystem
 * a _data_ directory with 2 unsolved problems.
-* two unit-tests: one test that runs the OptaPlanner `Solver` with on the unsolved problems as input, and one test that tests the `CloudBalanceRepository`.
+* a unit-tests that runs the OptaPlanner `Solver` with on the unsolved problems as input
 
 ### Compiling the project
 
@@ -244,35 +240,36 @@ A build will run and the output will be displayed in the console at the bottom o
 [INFO] ------------------------------------------------------------------------
 ```
 
-
 === Domain Model
 
-You have been provided with the domain model. This domain model consists of 3 classes:
+You have been provided with the domain model of our _Cloud Balance_ problem. This domain model consists of 3 classes:
 
 * `CloudProcess`: the process that needs to be assigned to a computer.
 * `CloudComputer`: the computer to which to assign the processes.
 * `CloudBalance`: this class holds the Cloud Balancing problem and solution, as well as the score of the solution.
 
 The `CloudBalance` class is the class in which we will load the initial problem. This means that this class holds a `Collection` of `CloudProcess` and a `Collection` of `CloudComputer`.
-While solving the problem, OptaPlanner creates a lot of different solutions, and for each solution it calculates a _score_. This score is also kept in the `CloudBalance` class.
+While solving the problem, OptaPlanner creates a lot of different solutions, and for each solution it calculates a _score_. This _score_ is also kept in the `CloudBalance` class.
 When OptaPlanner finds a solution with a better score than the current best score, this solution is cloned and kept in a cloned instance of our `CloudBalance` class.
 
-Although we've given you the basic domain model, the model is not yet complete and cannot yet be used by OptaPlanner. This is due to the fact that OptaPlanner is not aware yet of the roles that each class plays. We need to provide this information to OptaPlanner by annotating our domain model with OptaPlanner annotations.
+Although we've given you the basic domain model, the model is not yet complete and cannot yet be used by OptaPlanner. This is due to the fact that OptaPlanner is not aware yet of the roles that each class plays. We need to provide this information, or meta-data, to OptaPlanner by annotating the domain model with OptaPlanner annotations.
 
-To demonstrate this, we need to enable the unit-test found in class `org.optaplanner.examples.cloudbalancing.persistence.CloudBalancingSolverTest`. This class can be found in the `src/test/java` folder.
+To demonstrate this, we will run a unit-test that tests the OptaPlanner `Solver` with a provided data-set. We first need to enable the unit-test found in class `org.optaplanner.examples.cloudbalancing.persistence.CloudBalancingSolverTest`. This class can be found in the `src/test/java` folder.
 
-. Open the class `CloudBalancingSolverTest`.
-. Uncomment the `@Test` annotation on the `testCloudBalance` method.
+. Open the `CloudBalancingSolverTest` class.
+. Uncomment the `@Test` annotation on the `testSolver` method.
 +
 image:images/cloud-balancing-solver-test.png[]
 +
-. Right-click anywhere in the test class to open a contextual menu. Click on _Test -> Run Test_.
-image:images/codeready-run-test.png[]
+. Save the file.
+. With the unit-test enabled, we can run the test by simply running a Maven build. As we did previously, in the commands section, expand the _Build_ section, click on `build`, and in the main window of the IDE, click on the green `RUN` button.
 
-The test will fail with the following exception:
+image:images/codeready-maven-builds.png[]
+
+The test (and build) will fail with the following exception:
 
 ----
-The scanAnnotatedClasses (ScanAnnotatedClassesConfig()) did not find any classes with a PlanningSolution annotation.
+java.lang.IllegalStateException: The scanAnnotatedClasses (ScanAnnotatedClassesConfig()) did not find any classes with a PlanningSolution annotation.
 Maybe you forgot to annotate a class with a PlanningSolution annotation.
 ----
 
@@ -282,9 +279,9 @@ Before we can annotate our domain model, we need to understand a number of basic
 
 For OptaPlanner to be able to solve a problem, it basically needs to know 3 things about your planning problem:
 
-* What are the _Planning Entities_: A planning entity is a JavaBean (POJO) that changes during solving. For example, a Process that gets assigned to different computers, or a ShiftAssignment that gets assigned to employees.
-* What are the _Planning Variables_: a variable (or property, or attribute) of a PlannningEntity. This is the property that OptaPlanner can ‘play with’ during planning. For example the computer property of a Process, or the employee and shift of a ShiftAssignment.
-* What is the _PlanningSolution_: A dataset for a planning problem needs to be wrapped in a class OptaPlanner to solve. The solution class represents both the planning problem and (if solved) a solution. The PlanningSolution also holds the score of the solution.
+* What are the _Planning Entities_: A planning entity is a JavaBean (POJO) that changes during solving. For example, a process that gets assigned to different computers, or a shift assignment that gets assigned to employees.
+* What are the _Planning Variables_: a variable (or property, or attribute) of a `PlannningEntity`. This is the property that OptaPlanner can _play with_ during planning. For example the computer property of a process, or the employee and shift of a shift assignment.
+* What is the _Planning Solution_: A data-set for a planning problem needs to be wrapped in a class for OptaPlanner to be able to solve. The solution class represents both the planning problem and (if solved) a solution. This `PlanningSolution` also holds the score of the solution.
 
 The error we got when running our test stated that OptaPlanner could not find a class with a `@PlanningSolution` annotation. In our domain model, the `CloudBalance` class is the class that holds the planning problem, hence, this is our `PlanningSolution` class.
 
@@ -298,7 +295,7 @@ public class CloudBalance extends AbstractPersistable {
 ----
 +
 . Save the file.
-. Run the `CloudBalancingSolverTest` unit-test class.
+. Run the Maven build again to run the test.
 
 We have instructed OptaPlanner which class in our domain is our `PlanningSolution` class. When we look at the output of our unit-test, we will now see a different exception:
 
@@ -324,7 +321,7 @@ public class CloudProcess extends AbstractPersistable {
 ----
 +
 . Save the file.
-. Run the `CloudBalancingSolverTest` unit-test class.
+. Run the Maven build again to run the test.
 
 The new output of our test is:
 
@@ -333,7 +330,7 @@ java.lang.IllegalStateException: The solutionClass (class org.optaplanner.exampl
 
 ----
 
-We need to instruct OptaPlanner where it can find the collection of PlanningEnities (in our case a collection of `CloudProcess`) which it needs to plan.
+We need to instruct OptaPlanner where it can find the `Collection` of `PlanningEnity` (in our case a `Collection` of `CloudProcess`) which it needs to plan.
 Our `PlanningSolution` class, `CloudBalance`, is the class that contains our problem (and will hold our solution after planning), hence, we need to annotate the _getter_ method in our `CloudBalance` class that returns a `Collection<CloudProcess`.
 
 . Open the `CloudBalance` class.
@@ -346,7 +343,7 @@ public List<CloudProcess> getProcessList() {
 ----
 +
 . Save the file.
-. Run the `CloudBalancingSolverTest` unit-test class.
+. Run the Maven build again to run the test.
 
 The output shows:
 
@@ -386,13 +383,15 @@ public CloudComputer getComputer() {
 ----
 +
 . Save the file.
-. Run the `CloudBalancingSolverTest` unit-test class.
+. Run the Maven build again to run the test.
+
+The output is:
 
 ----
 The entityClass (class org.optaplanner.examples.cloudbalancing.domain.CloudProcess) has a PlanningVariable annotated property (computer) that has no valueRangeProviderRefs ([]).
 ----
 
-The final piece of the puzzle is to instruct OptaPlanner where it can find the range of value for our `PlanningVariable`. This is done through a so called `ValueRangeProvider`. As with the `PlanningEntity`, the range of values for our `PlanningVariable` is going to be configured on our `PlanningSolution` class (note that this is not the only option, _ValueRangeProviders_ can also be defined on the `PlanningEntity` class in certain cases).
+The final piece of the puzzle is to instruct OptaPlanner where it can find the range of values of our `PlanningVariable`. This is done through a so called `ValueRangeProvider`. As with the `PlanningEntity`, the range of values of our `PlanningVariable` is going to be configured on our `PlanningSolution` class (note that this is not the only option, _ValueRangeProviders_ can also be defined on the `PlanningEntity` class in certain cases).
 Apart from specifying the `ValueRangeProvider` in the `PlanningSolution` class, we need to also specify the reference to this `ValueRanegProvider` in the `@PlanningVariable` annotation of our `PlanningEntity` class. This is needed because problem domains can have more than one `PlanningVariable`.
 
 . Open the `CloudBalance` class.
@@ -405,8 +404,8 @@ public List<CloudComputer> getComputerList() {
 ----
 +
 . Save the file.
-. Next, open the `CloudProces` class.
-. Add the `valueRangeProviderRefs` attibute to the `PlanningVariable` annotation to reference the `computerRange` `ValueRangeProvider`.
+. Next, open the `CloudProcess` class.
+. Add the `valueRangeProviderRefs` attribute to the `@PlanningVariable` annotation to reference the `computerRange` `ValueRangeProvider`.
 +
 ----
 @PlanningVariable(valueRangeProviderRefs = {"computerRange"})
@@ -414,12 +413,12 @@ public CloudComputer getComputer() {
 ----
 +
 . Save the file.
-. Run the `CloudBalancingSolverTest` unit-test class.
+. Run the Maven build again to run the test.
 
 
 We can now see the test completing successfully.
 
-We have successfully imported and configured our domain model. However, we have not yet implemented our constraints that define the score of our solutions.
+We have successfully imported and configured our domain model. However, we have not yet implemented the constraints that define the score of our solutions.
 When we look at the output log lines of our test, we see:
 
 ----
@@ -431,7 +430,7 @@ We see that the score is *(0hard/0soft)*. This is due to the fact that the impor
 . Open the class `CloudBalancingEasyScoreCalculator`.It can be found in the `src/main/java` folder, in the package `org.optaplanner.examples.cloudbalancing.optional.score`.
 . Inspect the method `calculateScore`.
 
-As you can see, we simply return a _0hard/0soft_ score for every invocation. In the next section we will implement the constrains of our application.
+As you can see, we simply return a _0hard/0soft_ score for every invocation. In the next section we will implement the constrains of our planning problem.
 
 === The Score
 
@@ -776,3 +775,121 @@ In this extra lab you will create an OptaPlanner Benchmark report. OptaPlanner B
 * different datasets.
 
 ... and a combination of the above. It's an excellent tool to benchmark your solution and to create a report that indicates if your OptaPlanner solution peforms as expected and how to _power tweak_ your solution to create even better solutions to your problem than you already have (notice that a 2% better score can mean a substantial amount of resources and/or money in a real world application).
+
+
+. Create a new package called `org.optaplanner.examples.cloudbalancing.benchmark`.
+. In this package, create a new file called `CloudBalancingBenchmarker.java`.
+. Create a `main` method:
++
+----
+public static void main(String[] args) {
+}
+----
++
+. Save the file.
+
+OptaPlanner provides a very simple, easy to use, API that gets you started with the OptaPlanner Benchmark in just a few lines of code. On top of that, OptaPlanner provides a vast array of configuration options to configure and tweak the Benchmarker to your specific needs.
+
+The easiest way to get started is to create a Benchmarker from an existing `SolverFactory`, like the `SolverFactory` we create in our `CloudBalancingSolverTest`.
+
+. In the `main` method of our `CloudBalancingBenchmarker` class, add the following code:
++
+----
+public static void main(String[] args) {
+  SolverFactory<CloudBalance> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/cloudbalancing/solver/cloudBalancingSolverConfig.xml");
+  PlannerBenchmarkFactory benchmarkFactory = PlannerBenchmarkFactory.createFromSolverFactory(solverFactory);
+}
+----
++
+. Save the file.
+
+This creates a new `BenchmarkFactory` component from an existing `SolverFactory`. It uses the _Solver Configuration_ configured on the `SolverFactory`. Hence, the Benchmark will run with the exact same configuration as the confifguration we've used in our unit-tests so far.
+
+Next, we need to load the data-set we want to use in our benchmark. In this case we will use the data-set that contains 100 computers and 300 processes. Note that we can re-user our `CloudBalanceRepository` class to load the data-set.
+
+. In the `main` method of our `CloudBalanceBenchmark`, add the code to load the dataset.
++
+----
+public static void main(String[] args) {
+  SolverFactory<CloudBalance> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/cloudbalancing/solver/cloudBalancingSolverConfig.xml");
+  PlannerBenchmarkFactory benchmarkFactory = PlannerBenchmarkFactory.createFromSolverFactory(solverFactory);
+
+  File dataSetOne = new File("data/cloudbalancing/unsolved/100computers-300processes.xml");
+  CloudBalance cloudBalanceDataSet1 = CloudBalanceRepository.load(dataSetOne);
+}
+----
++
+. With our data-set loaded, we can now create and run the Benchmarker.
++
+----
+public static void main(String[] args) {
+  SolverFactory<CloudBalance> solverFactory = SolverFactory.createFromXmlResource("org/optaplanner/examples/cloudbalancing/solver/cloudBalancingSolverConfig.xml");
+  PlannerBenchmarkFactory benchmarkFactory = PlannerBenchmarkFactory.createFromSolverFactory(solverFactory);
+
+  File dataSetOne = new File("data/cloudbalancing/unsolved/100computers-300processes.xml");
+  CloudBalance cloudBalanceDataSet1 = CloudBalanceRepository.load(dataSetOne);
+
+  PlannerBenchmark benchmark = benchmarkFactory.buildPlannerBenchmark(cloudBalanceDataSet1);
+  benchmark.benchmark();
+}
+----
++
+. Save the file.
+. Run the class by  *TODO: explain how to run the benchmark in CodeReady*.
+
+
+After the benchmark has completed, a benchmark report will be available in the `local/benchmarkReport/{date-time}` folder in your CodeReady workspace.
+
+. Open the `index.html` file in the `local/benchmarkReport/{date-time}` folder.
+. Inspect the _Best Score Summary_ section:
+    * This section visualizes which _solver configuration_ produced the best score. Since we've only run the benchmarker with a single _solver configuration_. This graph currently only shows one entry. This graph is useful when you've defined multiple _solver configurations_, using different heuristic algorithmns, or different configurations of these algorithms, and you want to analyse which configuration works best for your problem and data-set.
+. Inspect the _Performance Summary_:
+    * This section shows the _Score Calculation Speed* of your configuration. This calculation speed is extremely important in an OptaPlanner project. The higher the calculation speed, the more moves OptaPlanner can execute and calculate in a given timeframe, the better the solution that OptaPlanner provides. A _Score Calculation Speed_ below 1000m should be addressed.
+. Inspect the _Problem Benchmarks_ section:
+    * This part of the report shows the progression of the _score_ over _time. As stated earlier, in the beginning of an OptaPlanner run, the score usually improves very quickly, after which finding better solutions slows down. The graph shown in the benchmark report clearly visualizes this. This is a great tool to:
+        . Inspect whether your solver follows this common pattern. If it does not, this usually indicates a problem in your solution, for example, a _score calculation count_ that is too low, or a problem that is stuck in a _local optima_.
+        . Compare the score progression of multiple solver configurations to determine which solver configuration works best for your planning problem.
+        . The point of _diminishing returns_, which can indicate how long you should run the solver (on an environment with comparable hardware).
+
+image:images/optaplanner-benchmark.png[]
+
+Furthermore, the report shows the actual _Solver Configuration_ used for each run, as well as information of the system on which the benchmark ran.
+
+
+
+=== Conclusion
+
+In this lab you've implemented your firt OptaPlanner solution. We've used the _Cloud Balancing_ example as our _planning problem_, in which we needed to assign processes to computers in such a way that we minimize the costs of our computers.
+
+We started with a given domain model that we annotated with OptaPlanner annotations. This was required in order to provide OptaPlanner with the meta-data about the domain model (i.e. what is the `PlanningEntity`, what are the `PlanningVariables`) it needs to run its _Solver_.
+
+After that we implemented the _constraint rules_ that calculate the score of a given solution. This provides OptaPlanner with the information it needs to be able to compare different solutions and determine which solution is the better solution.
+
+We've looked at the OptaPlanner API. We've seen how an OptaPlanner `Solver` can be created from a _solver configuration_, how data-sets of our problem can be loaded, and how we can pass a given data-set to an OptaPlanner `Solver` for it to be solved.
+
+Finally we've looked at the OptaPlanner Benchmarker, an important tool in an OptaPlanner project to analyse, visualize, inspect and maintain the health and performance of your OptaPlanner solution.
+
+=== Next steps
+
+This was a brief introduction to OptaPlanner which has shown you the basic concepts of the platform. The platform provides a vast array of features and functionality to solve planning problems in virtually any domain. Some examples of these features are:
+
+* Chained planning variables to support, for example, `Vehicle Routing Problems (VRP)`.
+* Overconstrained-planning.
+* Realtime-planning: in which the data-set can change in realtime.
+* Heatmaps to visualize which constraints lead to a certain score (i.e. to be able to explain the score).
+
+More information about OptaPlanner can be found at: https://www.optaplanner.org . This includes the full documentation, examples, trainings and presentations.
+
+
+== WIP
+
+NOTE: Bla Bla
+
+WARNING: In the OpenShift lab environment, which has limited resources, the login to jenkins might take a while and can eventually time out. If this is the case, you can skip the next step and safely continue with the remainder of the lab - the deployment of the application services.
+
+This is nice as well:
+
+----
+this is nice as well <1>
+----
+<1> see how nice that is!!
