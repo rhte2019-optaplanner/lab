@@ -181,7 +181,7 @@ NOTE: The CodeReady Workspaces environment has been provisioned for you so that 
 
 A CodeReady Workspaces environment has been created for every workshop user. To access your environment, use the link that is provided to you by your lab instructor. You can login with the OpenShift username and password that have been provided to you.
 
-- In the CodeReady Workspaces login screen, click on "Openshift v3" on the right part of the form. You will be redirected to the OpenShift login screen.
+- In the CodeReady Workspaces login screen, click on "*Openshift v3*" on the right part of the form. You will be redirected to the OpenShift login screen.
     image:images/codeready-login-openshift.png[]
 - Login with the workshop credentials that have been provided to you.
 - An _Authorize Access_ screen will be presented. Leave `user_full` checkbox checked and click on `Allow selected permissions`.
