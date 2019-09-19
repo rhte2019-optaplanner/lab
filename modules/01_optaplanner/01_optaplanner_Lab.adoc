@@ -141,27 +141,20 @@ A shared Openshift environment is provided. In this OpenShift environment we hav
 
 Details about the environment are obtained through the Red Hat Tech Exchange _GuidGrabber_.
 
-. In a browser window, navigate to http://bit.ly/summit-guidgrabber.
+. In a browser window, navigate to https://www.opentlc.com/gg/gg.cgi?profile=generic_rhte.
 +
 image::images/guid_grabber_landing_page_summit.png[]
-. From this page select the Lab Code : `TA39DD: Next-Gen Process Management: a microservices approach to business automation`
-. Enter the *Activation Key*: `nextgenprocessmanagement`.
+. From this page select the Lab Code : `S0005: OptaPlanner 101: Building your first optimization app using OptaPlanner.`
+. Enter the *Activation Key*: `planner`.
 . Enter your email address.
 . Click `Submit`.
 . The resulting page will display your lab’s GUID and other useful information about your lab environment. +
 +
 image::images/guid_grabber_details_page_2.png[]
 
-. When you are completely done with your lab environment, please click `Reset Workstation` so that you can move on to the next lab. If you fail to do this, you will be locked into the GUID from the previous lab.
-+
-NOTE: Clicking Reset Workstation will not stop or delete the lab environment.
+To log in into the CodeReady Workspaces console:
 
-To log in into the OpenShift console:
-
-* Navigate to the URL `https://master00-<GUID>.generic.opentlc.com` - replace `<GUID>` with the lab GUID from the GuidGrabber tool.
-* Login with username `user1` and the password mentioned in the GuidGrabber tool.
-* Your OpenShift cluster uses self-signed certificates, so expect a security warning in the browser. Create a security exception and proceed.
-
+* Navigate to the CodeReady Workspaces environment via the link provided in your GuidGrabber screen.
 
 == CodeReady WorkSpaces
 
