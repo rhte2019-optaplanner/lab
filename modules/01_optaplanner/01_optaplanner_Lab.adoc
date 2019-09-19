@@ -279,7 +279,7 @@ For OptaPlanner to be able to solve a problem, it basically needs to know 3 thin
 The error we got when running our test stated that OptaPlanner could not find a class with a `@PlanningSolution` annotation. In our domain model, the `CloudBalance` class is the class that holds the planning problem, hence, this is our `PlanningSolution` class.
 
 . Open the `CloudBalance` class. It can be found in the `src/main/java` folder, in the package `org.optaplanner.examples.cloudbalancing.domain`.
-. Add the `@PlanningAnnotation` to the class.
+. Add the `@PlanningSolution` to the class.
 +
 ----
 @PlanningSolution
@@ -491,6 +491,12 @@ global HardSoftScoreHolder scoreHolder;
 @ValueRangeProvider(id = "computerRange")
 @ProblemFactCollectionProperty
 public List<CloudComputer> getComputerList() {
+----
++
+. Make sure that you import this annotation in your class by adding an "import" statement at the top of your class (many IDEs do/can do this automatically):
++
+----
+import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty
 ----
 +
 . Save the file.
