@@ -356,7 +356,7 @@ public HardSoftScore getScore() {
 ----
 +
 . Save the file (note that in CodeReady Workspaces, files are automatically saved).
-. Run the `CloudBalancingSolverTest` unit-test class.
+. Run the Maven build again to run the test.
 
 The output shows:
 
