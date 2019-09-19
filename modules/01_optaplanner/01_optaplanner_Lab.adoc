@@ -254,7 +254,7 @@ To demonstrate this, we will run a unit-test that tests the OptaPlanner `Solver`
 +
 image:images/cloud-balancing-solver-test.png[]
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . With the unit-test enabled, we can run the test by simply running a Maven build. As we did previously, in the commands section, expand the _Build_ section, click on `build`, and in the main window of the IDE, click on the green `RUN` button.
 
 image:images/codeready-maven-builds.png[]
@@ -287,7 +287,7 @@ The error we got when running our test stated that OptaPlanner could not find a 
 public class CloudBalance extends AbstractPersistable {
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the Maven build again to run the test.
 
 We have instructed OptaPlanner which class in our domain is our `PlanningSolution` class. When we look at the output of our unit-test, we will now see a different exception:
@@ -313,7 +313,7 @@ image:images/cloudBalanceClassDiagram_2.png[]
 public class CloudProcess extends AbstractPersistable {
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the Maven build again to run the test.
 
 The new output of our test is:
@@ -335,7 +335,7 @@ Our `PlanningSolution` class, `CloudBalance`, is the class that contains our pro
 public List<CloudProcess> getProcessList() {
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the Maven build again to run the test.
 
 The output shows:
@@ -355,7 +355,7 @@ We need to tell OptaPlanner which field of the `PlanningSolution` class will con
 public HardSoftScore getScore() {
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the `CloudBalancingSolverTest` unit-test class.
 
 The output shows:
@@ -375,7 +375,7 @@ This indicates that we need to instruct OptaPlanner what the `PlanningVariable` 
 public CloudComputer getComputer() {
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the Maven build again to run the test.
 
 The output is:
@@ -396,7 +396,7 @@ Apart from specifying the `ValueRangeProvider` in the `PlanningSolution` class, 
 public List<CloudComputer> getComputerList() {
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Next, open the `CloudProcess` class.
 . Add the `valueRangeProviderRefs` attribute to the `@PlanningVariable` annotation to reference the `computerRange` `ValueRangeProvider`.
 +
@@ -405,7 +405,7 @@ public List<CloudComputer> getComputerList() {
 public CloudComputer getComputer() {
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the Maven build again to run the test.
 
 
@@ -473,7 +473,7 @@ import org.optaplanner.examples.cloudbalancing.domain.CloudProcess;
 global HardSoftScoreHolder scoreHolder;
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . In the same folder, open the `cloudBalancingSolverConfig.xml` file. This file contains the configuration of our _Solver_, like:
     * the _scoreDirectorFactory_ to use (which defines which type of _score calculator_ is used).
     * the _termination configuration (which defines when OptaPlanner should stop the _Solver_).
@@ -499,7 +499,7 @@ public List<CloudComputer> getComputerList() {
 import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Execute the `CloudBalancingSolverTest` by runnning a Maven build.
 
 If the test has ran successfully, the output should show the following:
@@ -604,14 +604,14 @@ then
 end
 ----
 +
-. Save the DRL file and run the build, which will also execute our tests.
+. Save the DRL file and run the build, which will also execute our tests (note that in CodeReady Workspaces, files are automatically saved).
 
 We can now implement the other two hard constraints, the constraints for the memory and network bandwidth.
 
 . Open the DRL file.
 . Add 2 new hard constraint rules. Call them `requiredMemoryTotal` and `requiredNetWorkBandwidthTotal`.
 . Implement the rules in exactly the same way as the rule for the CPU power.
-. Save the DRL file and run a Maven build, which will execute the tests.
+. Save the DRL file and run a Maven build, which will execute the tests (note that in CodeReady Workspaces, files are automatically saved).
 
 With the hard constraints implemented, it's now time to implement the _soft constraints_.
 
@@ -674,7 +674,7 @@ then
 end
 ----
 +
-. Save the DRL file and run a Maven build, which also will run the tests.
+. Save the DRL file and run a Maven build, which also will run the tests (note that in CodeReady Workspaces, files are automatically saved).
 
 If everything works correctly, you should see the following output when the _Solver_ test completes:
 
@@ -719,7 +719,7 @@ Let's first change the data-set file to a larger data-set and set the _terminati
 File inputFile = new File("data/cloudbalancing/unsolved/100computers-300processes.xml");
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Open the `cloudBalancingSolverConfig.xml`.
 . Increase the `millisecondsSpentLimit` to 30000:
 +
@@ -727,7 +727,7 @@ File inputFile = new File("data/cloudbalancing/unsolved/100computers-300processe
 <millisecondsSpentLimit>30000</millisecondsSpentLimit>
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the Maven build, which will run the unit tests.
 
 If all is well, you will see the following lines in your log:
@@ -751,7 +751,7 @@ I.e. a score of _0hard/-118790soft_. As a demonstration, let's give OptaPlanner 
 <millisecondsSpentLimit>60000</millisecondsSpentLimit>
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 . Run the Maven build, which will run the unit tests.
 
 When we now look at the output, we can see that OptaPlanner has found an even better solution.
@@ -795,7 +795,7 @@ public static void main(String[] args) {
 }
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 
 OptaPlanner provides a very simple, easy to use, API that gets you started with the OptaPlanner Benchmark in just a few lines of code. On top of that, OptaPlanner provides a vast array of configuration options to configure and tweak the Benchmarker to your specific needs.
 
@@ -811,7 +811,7 @@ public static void main(String[] args) {
 }
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 
 This creates a new `BenchmarkFactory` component from an existing `SolverFactory`. It uses the _Solver Configuration_ configured on the `SolverFactory`. Hence, the Benchmark will run with the exact same configuration as the confifguration we've used in our unit-tests so far.
 
@@ -850,7 +850,7 @@ public static void main(String[] args) {
 }
 ----
 +
-. Save the file.
+. Save the file (note that in CodeReady Workspaces, files are automatically saved).
 
 We now need to execute the class. We've provided a Maven _profile_ in the project's POM file that executes the `CloudBalancingBenchmarker` class. To execute the Maven goal with the given profile, we need to create a new Maven build script.
 
