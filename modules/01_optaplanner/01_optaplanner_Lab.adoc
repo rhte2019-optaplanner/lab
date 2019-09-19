@@ -496,7 +496,7 @@ public List<CloudComputer> getComputerList() {
 . Make sure that you import this annotation in your class by adding an "import" statement at the top of your class (many IDEs do/can do this automatically):
 +
 ----
-import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty
+import org.optaplanner.core.api.domain.solution.drools.ProblemFactCollectionProperty;
 ----
 +
 . Save the file (note that in CodeReady Workspaces, files are automatically saved).
