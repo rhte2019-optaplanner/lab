@@ -385,7 +385,7 @@ The entityClass (class org.optaplanner.examples.cloudbalancing.domain.CloudProce
 ----
 
 The final piece of the puzzle is to instruct OptaPlanner where it can find the range of values of our `PlanningVariable`. This is done through a so called `ValueRangeProvider`. As with the `PlanningEntity`, the range of values of our `PlanningVariable` is going to be configured on our `PlanningSolution` class (note that this is not the only option, _ValueRangeProviders_ can also be defined on the `PlanningEntity` class in certain cases).
-Apart from specifying the `ValueRangeProvider` in the `PlanningSolution` class, we need to also specify the reference to this `ValueRanegProvider` in the `@PlanningVariable` annotation of our `PlanningEntity` class. This is needed because problem domains can have more than one `PlanningVariable`.
+Apart from specifying the `ValueRangeProvider` in the `PlanningSolution` class, we need to also specify the reference to this `ValueRangeProvider` in the `@PlanningVariable` annotation of our `PlanningEntity` class. This is needed because problem domains can have more than one `PlanningVariable`.
 
 . Open the `CloudBalance` class.
 . Locate the method `getComputerList()`.
