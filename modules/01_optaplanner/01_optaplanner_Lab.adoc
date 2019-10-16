@@ -324,7 +324,7 @@ java.lang.IllegalStateException: The solutionClass (class org.optaplanner.exampl
 ----
 
 We need to instruct OptaPlanner where it can find the `Collection` of `PlanningEntity` (in our case a `Collection` of `CloudProcess`) which it needs to plan.
-Our `PlanningSolution` class, `CloudBalance`, is the class that contains our problem (and will hold our solution after planning), hence, we need to annotate the _getter_ method in our `CloudBalance` class that returns a `Collection<CloudProcess`.
+Our `PlanningSolution` class, `CloudBalance`, is the class that contains our problem (and will hold our solution after planning), hence, we need to annotate the _getter_ method in our `CloudBalance` class that returns a `Collection<CloudProcess>`.
 
 . Open the `CloudBalance` class.
 . Locate the method `getProcessList()`
