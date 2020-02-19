@@ -783,7 +783,7 @@ In this extra lab you will create an OptaPlanner Benchmark report. OptaPlanner B
 * different algorithm configurations.
 * different datasets.
 
-and a combination of the above. It's an excellent tool to benchmark your solution and to create a report that indicates if your OptaPlanner solution peforms as expected. It also helps to _power tweak_ your solution to create even better solutions to your problem than you already have (notice that a 2% better score can mean a substantial amount of resources and/or money in a real world application).
+and a combination of the above. It's an excellent tool to benchmark your solution and to create a report that indicates if your OptaPlanner solution performs as expected. It also helps to _power tweak_ your solution to create even better solutions to your problem than you already have (notice that a 2% better score can mean a substantial amount of resources and/or money in a real world application).
 
 
 . Create a new package called `org.optaplanner.examples.cloudbalancing.benchmark` in the `src/main/java` folder.
