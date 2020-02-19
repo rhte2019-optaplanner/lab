@@ -813,7 +813,7 @@ public static void main(String[] args) {
 +
 . Save the file (note that in CodeReady Workspaces, files are automatically saved).
 
-This creates a new `BenchmarkFactory` component from an existing `SolverFactory`. It uses the _Solver Configuration_ configured on the `SolverFactory`. Hence, the Benchmark will run with the exact same configuration as the confifguration we've used in our unit-tests so far.
+This creates a new `BenchmarkFactory` component from an existing `SolverFactory`. It uses the _Solver Configuration_ configured on the `SolverFactory`. Hence, the Benchmark will run with the exact same configuration as the configuration we've used in our unit-tests so far.
 
 Next, we need to load the data-set we want to use in our benchmark. In this case we will use the data-set that contains 100 computers and 300 processes. Note that we can re-user our `CloudBalanceRepository` class to load the data-set.
 
