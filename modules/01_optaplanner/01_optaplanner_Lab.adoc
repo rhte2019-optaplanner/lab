@@ -100,13 +100,12 @@ The material consists of a number of git repositories:
 * *cloud-balancing-lab-step-1*: https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-1
 * *cloud-balancing-lab-step-2*: https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-2
 
-
-These Git repositories represent different stages within the lab. As we you only have 120 minutes to finnish the lab, some parts of the application have already been pre-defined for you in each step.
+These Git repositories represent different stages within the lab. The scheduled time for this lab is 120 minutes and therefore some parts of the application have already been pre-defined for you.
 
 
 == Code Walkthrough
 
-Given the limited amount of time we have for this lab, we will provide you with the full domain model of our _Cloud Balancing_ problem. Your tasks will be to:
+Given the limited amount of time we have for this lab, we provide you with the full domain model of the _Cloud Balancing_ problem. Your tasks are to:
 
 * annotate the domain model with the correct OptaPlanner annotations that instruct the engine which roles the specific classes of our model play in our solution.
 * write the constraint rules of the solution that instruct OptaPlanner on what to optimize.
@@ -122,6 +121,7 @@ There are 2 classes:
 * `Computer`: the computer on which to run the process.
 
 A _Process_ has requirements in terms of required resources:
+
 * Computer
 * Memory
 * Network Bandwidth
@@ -139,13 +139,13 @@ The goal is to create a planning solution that places _processes_ on _computers_
 
 A shared Openshift environment is provided. In this OpenShift environment we have deployed a _CodeReady Workspaces_ environment: a collaborative Kubernetes-native development solution that delivers OpenShift workspaces and in-browser IDE for rapid cloud application development.
 
-Details about the environment are obtained through the Red Hat Tech Exchange _GuidGrabber_.
+Details about the environment are obtained through the Red Hat _GuidGrabber_.
 
-. In a browser window, navigate to https://www.opentlc.com/gg/gg.cgi?profile=generic_rhte.
+. In a browser window, navigate to the _GuidGrabber_ address provided by your instructor.
 +
 image::images/guid_grabber_landing_page_summit.png[]
-. From this page select the Lab Code : `S0005: OptaPlanner 101: Building your first optimization app using OptaPlanner.`
-. Enter the *Activation Key*: `planner`.
+. From this page select the Lab Code provided by your instructor.
+. Enter the *Activation Key* provided by your instructor.
 . Enter your email address.
 . Click `Submit`.
 . The resulting page will display your lab’s GUID and other useful information about your lab environment. +
@@ -154,7 +154,7 @@ image::images/guid_grabber_details_page_2.png[]
 
 To log in into the CodeReady Workspaces console:
 
-* Navigate to the CodeReady Workspaces environment via the link provided in your GuidGrabber screen.
+* Navigate to the CodeReady Workspaces environment via the link provided in your _GuidGrabber_ screen.
 
 == CodeReady WorkSpaces
 
@@ -174,9 +174,12 @@ NOTE: The CodeReady Workspaces environment has been provisioned for you so that 
 
 A CodeReady Workspaces environment has been created for every workshop user. To access your environment, use the link that is provided to you by your lab instructor. You can login with the OpenShift username and password that have been provided to you.
 
-- In the CodeReady Workspaces login screen, click on "*Openshift v3*" on the right part of the form. You will be redirected to the OpenShift login screen.
-    image:images/codeready-login-openshift.png[]
-- Login with the workshop credentials that have been provided to you.
+- In the CodeReady Workspaces login screen, login with the workshop credentials that have been provided to you.
++
+image:images/codeready-login-openshift.png[]
++
+image:images/codeready-login-openshift-username-password.png[]
++
 - An _Authorize Access_ screen will be presented. Leave `user_full` checkbox checked and click on `Allow selected permissions`.
     image:images/codeready-authorize-access.png[]
 - In the next screen, provide additional user information. This can be dummy information for this workshop.
@@ -186,23 +189,35 @@ CodeReady Workspaces will open and show the initial screen.
 
 image:images/codeready-initial-screen.png[]
 
+### Creating the Workspace
 
-### Importing the Project
+We will now create our workspace from a CodeReady _devfile_. This file contains, among other things, the instructions:
+* which _stack_ (e.g. Java 8, Maven) our workspace will be based on
+* which plugins we want to install
+* which project will be cloned/imported
+* which actions/commands we want to make available.
 
-We will now import the base project, which already includes the solution's domain classed, into CodeReady. CodeReady allows us to directly import existing projects from GitHub.
+To create a new workspace from our _devfile_, click on the `Create a Custom Workspace` link in the upper right corner of the _Getting Started_ screen.
 
-In the initial screen, the `New Workspace` screen, that the platform provides us, we can import a new project.
+image:images/codeready-initial-screen.png[]
 
-1. Provide a name for your workspace, postfixed by your username. E.g, `cloud-balancing-user1` if you're username is `user1`.
-2. Select the _stack_. In this case we select `Java 1.8`.
-3. Set the RAM (memory) of the `dev-machine` to 2GB (default value).
-4. Click on _'Create and Open'_ button to create the workspace.
-    image:images/codeready-new-workspace.png[]
-5. When the workspace has been created, click on _'Import Project'_.
-    image:images/codeready-workspace-created.png[]
-6. In the _'Import Project'_ window, select `GITHUB` as the _Version Control System_, set the URL to `https://github.com/rhte2019-optaplanner/cloud-balancing-lab-step-1` and click on the _'Import'_ button.
-    image:images/codeready-workspaces-import-lab1.png[]
-7. In the _'Project Configuration'_ screen, select `Maven` and click the _'Save'_ button.
+In the next screen, click on the `IMPORT DEVFILE` link:
+
+image:images/codeready-create-custom-workspace.png[]
+
+In the `URL` field, enter the following URL to our _devfile_: https://raw.githubusercontent.com/rhte2019-optaplanner/cloud-balancing-lab-crw/master/cloud-balancing-lab-crw-devfile.yaml
+Click on the green `CREATE & OPEN` button.
+
+image:images/codeready-devfile-create-and-open.png[]
+
+CodeReady Workspaces will create a new workspace container in our OpenShift instance. Note that creating the container can take some time. Wait for this process to finish.
+
+The workspace automatically import the base project, which already includes the solution's domain classed, into CodeReady. This project is automatically imported from Github, as defined in our _devfile_.
+
+When your environment is up and running, click on the _Explorer_ button in the upper left corner to open the project explorer.
+Expand the `cloud-balancing-lab` and navigate the project structure.
+
+image:images/codeready-file-explorer.png[]
 
 Our imported project is our base _Cloud Balancing_ project. It contains:
 
@@ -215,15 +230,17 @@ Our imported project is our base _Cloud Balancing_ project. It contains:
 
 ### Compiling the project
 
-To make sure our project for Lab1 is properly imported and configured, we will first run a Maven build. To do this, we need to access the CodeReady commands as show in the image below:
+To make sure our project for Lab1 is properly imported and configured, we will first run a Maven build.
+To do this, we can run the Maven _Build_ command that is available in our workspace.
+Click on the cube icon on the right hand side of the screen. Click on _User Runtimes -> maven -> Build_.
+This will execute a `mvn clean install` command in a new terminal:
 
-image:images/codeready-manage-commands.png[]
+image:images/codeready-maven-build.png[]
 
-In the commands section, expand the _Build_ section, click on `build`, and in the main window of the IDE, click on the green `RUN` button.
+The build will start downloading the project's Maven dependencies and compile the project. After a while, the terminal will show that the build was successful.
 
-image:images/codeready-maven-builds.png[]
+image:images/codeready-cloud-balance-build-successful.png[]
 
-A build will run and the output will be displayed in the console at the bottom of the screen. If the build succeeded, the following message will be displayed:
 ```
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -255,9 +272,9 @@ To demonstrate this, we will run a unit-test that tests the OptaPlanner `Solver`
 image:images/cloud-balancing-solver-test.png[]
 +
 . Save the file (note that in CodeReady Workspaces, files are automatically saved).
-. With the unit-test enabled, we can run the test by simply running a Maven build. As we did previously, in the commands section, expand the _Build_ section, click on `build`, and in the main window of the IDE, click on the green `RUN` button.
+. With the unit-test enabled, we can run the test by simply running the Maven build again. As we did previously, click on the Maven `Build` action on the right hand side of the screen.
 
-image:images/codeready-maven-builds.png[]
+image:images/codeready-maven-build.png[]
 
 The test (and build) will fail with the following exception:
 
@@ -852,29 +869,17 @@ public static void main(String[] args) {
 +
 . Save the file (note that in CodeReady Workspaces, files are automatically saved).
 
-We now need to execute the class. We've provided a Maven _profile_ in the project's POM file that executes the `CloudBalancingBenchmarker` class. To execute the Maven goal with the given profile, we need to create a new Maven build script.
+We now need to execute the class. We've provided a Maven _profile_ in the project's POM file that executes the `CloudBalancingBenchmarker` class. To execute the Maven goal with the given profile, we need to execute the correct Maven action.
 
-. Open the _"Manage commands"_ section in your CodeReady Workspaces environment:
+. Open the _"MY WORKSPACE"_ section in your CodeReady Workspaces by clicking on the cube icon on the right hand side of the screen. This will open the window that contains our Maven actions:
 +
-image:images/codeready-manage-commands.png[]
+image:images/codeready-maven-build.png[]
 +
-. In the _"Build"_ category, click the `+` button to add a new _build configuration_. Select _"Maven"_.
-+
-image:images/codeready-benchmarker-maven-build.png[]
-+
-. Name your new build configuration `benchmarker` and configure it with the following line:
-+
-----
-mvn clean install exec:java -DskipTests -Pbenchmarker -f ${current.project.path}
-----
-+
-image:images/codeready-benchmarker-maven-build-config.png[]
-+
-. Run the build by clicking on the green _"Run"_ button.
+. Click on the `Run benchmarker` action to run a build with `benchmarker` profile activated.
 
 After the benchmark has completed, a benchmark report will be available in the `local/benchmarkReport/{date-time}` folder in your CodeReady workspace.
 
-. Open the `index.html` file in the `local/benchmarkReport/{date-time}` folder. You can open the `index.html` by right-clicking on the file and selecting _"Preview"_.
+. Open the `index.html` file in the `local/benchmarkReport/{date-time}` folder. You can open the `index.html` by right-clicking on the file and selecting _Open With -> Preview_.
 +
 image:images/codeready-benchmarker-index-html.png[]
 +
@@ -900,10 +905,9 @@ image:images/optaplanner-benchmark.png[]
 Furthermore, the report shows the actual _Solver Configuration_ used for each run, as well as information of the system on which the benchmark ran.
 
 
-
 === Conclusion
 
-In this lab you've implemented your firt OptaPlanner solution. We've used the _Cloud Balancing_ example as our _planning problem_, in which we needed to assign processes to computers in such a way that we minimize the costs of our computers.
+In this lab you've implemented your first OptaPlanner solution. We've used the _Cloud Balancing_ example as our _planning problem_, in which we needed to assign processes to computers in such a way that we minimize the costs of our computers.
 
 We started with a given domain model that we annotated with OptaPlanner annotations. This was required in order to provide OptaPlanner with the meta-data about the domain model (i.e. what is the `PlanningEntity`, what are the `PlanningVariables`) it needs to run its _Solver_.
 
