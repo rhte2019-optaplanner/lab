@@ -2,7 +2,7 @@
 :data-uri:
 :toc2:
 
-= Red Hat Tech Exchange 2019: OptaPlanner 101 - Building your first optimization app using OptaPlanner's AI Constraint Solver
+= OptaPlanner 101 - Building your first optimization app using OptaPlanner's AI Constraint Solver
 
 == Background
 
@@ -191,24 +191,18 @@ image:images/codeready-initial-screen.png[]
 
 ### Creating the Workspace
 
-We will now create our workspace from a CodeReady _devfile_. This file contains, among other things, the instructions:
-* which _stack_ (e.g. Java 8, Maven) our workspace will be based on
-* which plugins we want to install
-* which project will be cloned/imported
-* which actions/commands we want to make available.
+We will now create our workspace from a the `OptaPlanner Workshop` stack that we've provided in your CodeReady Workspaces environment.
+This stack contains:
+* OpenJDK 8
+* Maven 3.5.x
+* The OptaPlanner Cloud-Balancing lab repository
+* Pre-defined Maven commands to build the project, run its unit-tests and run the OptaPlanner Benchmarker.
 
-To create a new workspace from our _devfile_, click on the `Create a Custom Workspace` link in the upper right corner of the _Getting Started_ screen.
+To create a new workspace, scroll down in the `Getting Started with CodeReady Workspaces` page until you see the `OptaPlanner Workshop` stack.
+Select the stack and click on the green `CREATE & OPEN` button.
 
-image:images/codeready-initial-screen.png[]
+image:images/codeready-optaplanner-workshop-stack.png[]
 
-In the next screen, click on the `IMPORT DEVFILE` link:
-
-image:images/codeready-create-custom-workspace.png[]
-
-In the `URL` field, enter the following URL to our _devfile_: https://raw.githubusercontent.com/rhte2019-optaplanner/cloud-balancing-lab-crw/master/cloud-balancing-lab-crw-devfile.yaml
-Click on the green `CREATE & OPEN` button.
-
-image:images/codeready-devfile-create-and-open.png[]
 
 CodeReady Workspaces will create a new workspace container in our OpenShift instance. Note that creating the container can take some time. Wait for this process to finish.
 
@@ -875,7 +869,7 @@ We now need to execute the class. We've provided a Maven _profile_ in the projec
 +
 image:images/codeready-maven-build.png[]
 +
-. Click on the `Run benchmarker` action to run a build with `benchmarker` profile activated.
+. Click on the `Run benchmarker` action to run a build with `benchmarker` profile activated. This will run the Maven command: `mvn clean install exec:java -DskipTests -Pbenchmarker`
 
 After the benchmark has completed, a benchmark report will be available in the `local/benchmarkReport/{date-time}` folder in your CodeReady workspace.
 
